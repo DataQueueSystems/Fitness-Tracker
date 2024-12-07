@@ -14,8 +14,8 @@ const lightTheme = {
     blue: '#4a51a3', // Deep Blue
     green: '#388E3C',
     appColor: '#2F80ED',
-    appDark: '#161626',
-    btn:"#2F80ED"
+    appDark: '#F4F4F9',
+    btn: '#2F80ED',
   },
   roundness: 8,
 };
@@ -28,7 +28,7 @@ const darkTheme = {
     green: '#388E3C',
     appColor: '#2F80ED',
     appDark: '#161626',
-    btn:"#2F80ED"
+    btn: '#2F80ED',
   },
   roundness: 8,
 };

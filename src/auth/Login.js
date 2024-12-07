@@ -21,7 +21,7 @@ export default function Login() {
   let theme = useTheme();
   const {setIsLogin, Checknetinfo, setUserDetail} = useAuthContext();
   let navigation = useNavigation();
-  
+
   const [spinner, setSpinner] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -31,7 +31,6 @@ export default function Login() {
   });
 
   let screenName = '';
-
   const handleChange = (field, value) => {
     setForm(prevForm => ({
       ...prevForm,
@@ -39,24 +38,22 @@ export default function Login() {
     }));
   };
 
-
-
   const CheckDataBase = async () => {
     setSpinner(true);
     let isConnected = await Checknetinfo();
     if (!isConnected) {
       setSpinner(false);
       return;
-    }
+    };
     try {
-      const snapShot = await firestore().collection('conductor').get();
+      const snapShot = await firestore().collection('users').get();
       if (snapShot.empty) {
         showToast('No user found');
         return;
       }
       let userDoc = snapShot.docs.find(doc => {
         const data = doc.data();
-        return data.email == email && data.password == password;
+        return data.email == form.email && data.password == form.password;
       });
       if (!userDoc) {
         setSpinner(false);
@@ -70,8 +67,6 @@ export default function Login() {
         setIsLogin(false);
       }
     } catch (error) {
-      console.log(error, 'error');
-
       showToast('Something went wrong');
     }
   };
@@ -85,23 +80,18 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-
-  
   const handleLogin = async () => {
-    // setSpinner(true);
-    // const isConnected = await Checknetinfo();
-    // if (!isConnected) {
-    //   setSpinner(false);
-    //   return;
-    // }
-    // if (validateForm()) {
-    //   let CanAdd = await CheckDataBase(); // Checks for existing user
-    //   console.log(CanAdd, 'CanAdd');
-    // } else {
-    //   showToast('Some invalid data');
-    // }
-    setIsLogin(false);
-
+    setSpinner(true);
+    const isConnected = await Checknetinfo();
+    if (!isConnected) {
+      setSpinner(false);
+      return;
+    }
+    if (validateForm()) {
+      let CanAdd = await CheckDataBase(); // Checks for existing user
+    } else {
+      showToast('Some invalid data');
+    }
   };
 
   const handleRegister = () => {
@@ -139,9 +129,7 @@ export default function Login() {
 
           {/* Inputs */}
           <View style={styles.inputContainer}>
-          
-          
-          <TextInput
+            <TextInput
               style={[
                 styles.input,
                 {
@@ -192,8 +180,6 @@ export default function Login() {
                 {errors.password}
               </CustomText>
             )}
-
-
 
             <Button
               onPress={spinner ? () => {} : handleLogin}

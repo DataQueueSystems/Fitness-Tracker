@@ -1,25 +1,49 @@
 import {
+  Animated,
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {Divider, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import CustomText from '../customText/CustomText';
 import {fonts} from '../customText/fonts';
 import {Iconify} from 'react-native-iconify';
+import {useAuthContext} from '../context/GlobaContext';
+import ImageModal from '../component/Modal/ImageModal';
 
 export default function Profile() {
   let theme = useTheme();
+  const {userDetail} = useAuthContext();
   let navigation = useNavigation();
   let size = 30;
-  const handleEdit=()=>{
-    navigation.navigate("EditProfile")
-  }
+  const handleEdit = () => {
+    navigation.navigate('EditProfile');
+  };
+
+  const [visible, setVisible] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [previmage, setPrevimage] = useState(null);
+  const [selectedImageUri, setSelectedImageUri] = useState(null);
+
+  // Function to handle opening the modal with animation
+  const handlePrevImage = () => {
+    setVisible(true);
+    let imageUri = userDetail?.profile_image?.imageUri;
+    setPrevimage(selectedImageUri || imageUri);
+    Animated.timing(opacityAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+
   return (
     <>
       <View
@@ -41,20 +65,36 @@ export default function Profile() {
               />
             </View>
             <View className="flex-column items-center justify-center space-y-3 my-4">
-              <Image
-                className="rounded-full"
-                source={{
-                  uri: 'https://img.freepik.com/free-photo/handsome-young-man-with-new-stylish-haircut_176420-19636.jpg?t=st=1733376805~exp=1733380405~hmac=1817ce5a6f6fc544dec6790dbd692226536f275ee5b494d120227147554eb769&w=2000',
-                }}
-                style={{width: 100, height: 100}}
-              />
+              {userDetail?.profile_image?.imageUri ? (
+                <TouchableOpacity 
+                onPress={handlePrevImage}
+                >
+  <Image
+                  source={{uri: userDetail?.profile_image?.imageUri}}
+                  className="rounded-full"
+                  style={{width: 100, height: 100}}
+                />
+                </TouchableOpacity>
+              
+              ) : (
+                <TouchableOpacity 
+                onPress={handlePrevImage}
+                >
+                <Image
+                  source={require('../../assets/Image/defaultAvtar.jpg')}
+                  className="rounded-full"
+                  style={{width: 100, height: 100}}
+                />
+                </TouchableOpacity>
+              )}
+
               <CustomText
                 className="text-[19px]"
                 style={{
                   fontFamily: fonts.SemiBold,
                   color: theme.colors.appColor,
                 }}>
-                Rilwan
+                {userDetail?.name}
               </CustomText>
             </View>
 
@@ -97,7 +137,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    r@gmail.com
+                    {userDetail?.email}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -123,7 +163,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    1234567892
+                    {userDetail?.contact ? userDetail?.contact : '--'}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -149,7 +189,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    23
+                    {userDetail?.age ? userDetail?.age : '--'}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -175,7 +215,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    Male
+                    {userDetail?.gender ? userDetail?.gender : '--'}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -201,7 +241,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    100
+                    {userDetail?.height ? userDetail?.height : '--'}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -227,7 +267,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    100
+                    {userDetail?.weight ? userDetail?.weight : '--'}
                   </CustomText>
                 </View>
               </View>
@@ -235,6 +275,13 @@ export default function Profile() {
           </ScrollView>
         </View>
       </View>
+
+      <ImageModal
+        visible={visible}
+        image={previmage}
+        opacityAnim={opacityAnim}
+        setVisible={setVisible}
+      />
     </>
   );
 }
@@ -243,5 +290,9 @@ const styles = StyleSheet.create({
   maincontainer: {
     flex: 1,
     paddingHorizontal: 10,
+  },
+  profileImage: {
+    height: 100,
+    weight: 100,
   },
 });

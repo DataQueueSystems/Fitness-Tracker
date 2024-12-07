@@ -14,6 +14,7 @@ import {
   import React, {useRef} from 'react';
   import {IconButton, useTheme} from 'react-native-paper';
 import CustomText from '../../customText/CustomText';
+import { fonts } from '../../customText/fonts';
   
   export default function ImageModal({visible, image, opacityAnim, setVisible}) {
     let theme = useTheme();
@@ -59,7 +60,7 @@ import CustomText from '../../customText/CustomText';
                     />
                   ) : (
                     <CustomText
-                      style={{color: theme.colors.onBackground, fontSize: 16}}>
+                      style={{color: theme.colors.onBackground, fontSize: 16,fontFamily:fonts.Regular}}>
                       No Image Found
                     </CustomText>
                   )}

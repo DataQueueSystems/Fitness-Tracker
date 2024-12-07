@@ -39,43 +39,40 @@ export default function Register() {
     }));
   };
 
-
   const CheckDataBase = async () => {
     setSpinner(true);
     let isConnected = await Checknetinfo();
     if (!isConnected) {
       setSpinner(false);
-      return;
+      return false;
     }
     try {
-      const snapShot = await firestore().collection('conductor').get();
+      const snapShot = await firestore().collection('users').get();
       if (snapShot.empty) {
         showToast('No user found');
-        return;
-      }
-      let userDoc = snapShot.docs.find(doc => {
-        const data = doc.data();
-        return data.email == email && data.password == password;
-      });
-      if (!userDoc) {
         setSpinner(false);
-        showToast('Invalid email or password');
-        return;
-      } else {
-        let userData = {id: userDoc.id, ...userDoc.data()};
-        await setUserDetail(userData);
-        await AsyncStorage.setItem('token', userData.id);
-        AsyncStorage.setItem('IsLogin', 'true');
-        setIsLogin(false);
+        return false;
       }
-    } catch (error) {
-      console.log(error, 'error');
+      // Flags to track existence of each field
+      let emailExists = false;
+      // Check each document for matches on the given fields
+      snapShot.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.email === form.email) emailExists = true;
+      });
 
+      let newErrors = {};
+      // Display relevant messages for each existing field
+      if (emailExists) newErrors.email = 'Email already exists.';
+      setSpinner(false);
+      // If any of the fields exist, return false; otherwise, return true
+      return !emailExists;
+    } catch (error) {
       showToast('Something went wrong');
+      setSpinner(false);
+      return false;
     }
   };
-
-  
 
   const validateForm = () => {
     const newErrors = {};
@@ -86,23 +83,34 @@ export default function Register() {
     setSpinner(false);
     return Object.keys(newErrors).length === 0;
   };
-  
 
   const handleRegister = async () => {
-    setSpinner(true);
-    const isConnected = await Checknetinfo();
-    if (!isConnected) {
-      setSpinner(false);
-      return;
-    }
     if (validateForm()) {
       let CanAdd = await CheckDataBase(); // Checks for existing user
-      console.log(CanAdd, 'CanAdd');
+      if (CanAdd) {
+        try {
+          // Prepare default data for new user
+          let defaultData = {
+            ...form,
+            Status: 'Active',
+            create_date: new Date().toISOString(), // Current date and time in ISO format
+          };
+          // Add new user to Firestore
+          await firestore().collection('users').add(defaultData);
+          showToast('Registration successful!');
+          navigation.goBack();
+        } catch (error) {
+          showToast('Error creating user');
+        } finally {
+          setSpinner(false);
+        }
+      } else {
+        showToast('User already exists');
+        setSpinner(false);
+      }
     } else {
       showToast('Some invalid data');
     }
-
-    // await CheckDataBase();
   };
 
   const NavigateToLogin = () => {

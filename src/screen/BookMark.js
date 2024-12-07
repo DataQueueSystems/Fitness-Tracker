@@ -1,27 +1,169 @@
 import React from 'react';
-import {View, StyleSheet, Text, ScrollView} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  FlatList,
+  Appearance,
+  TouchableOpacity,
+} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useTheme} from 'react-native-paper';
 import Header from '../component/Header';
 import CustomText from '../customText/CustomText';
 import {fonts} from '../customText/fonts';
+import {useAuthContext} from '../context/GlobaContext';
+import LinearGradient from 'react-native-linear-gradient';
+import {Iconify} from 'react-native-iconify';
+import { showToast } from '../../utils/Toast';
 
 const Tab = createMaterialTopTabNavigator();
 
 // Exercise Screen
 function ExerciseScreen() {
+  const {favExercise, favFood, setFavExercise} = useAuthContext(); // Getting favorites
   let theme = useTheme();
 
+  let mode = Appearance.getColorScheme();
+  const gradientColors =
+    mode == 'light'
+      ? [
+          ['#EAF4FE', '#BBDFFA'], // Light blue to soft blue (calming for light mode)
+          ['#E3F2FD', '#90CAF9'], // Pale blue to sky blue (subtle)
+        ]
+      : [
+          ['#14325a', '#A1C4FD'], // Blue to soft light blue (complementing blue tones)
+          ['#14325a', '#4B4B59'], // Blue to dark grayish tone (contrast with dark appDark)
+        ];
+
+  // Function to get a random gradient color
+  const getRandomGradient = () => {
+    const randomIndex = Math.floor(Math.random() * gradientColors.length);
+    return gradientColors[randomIndex];
+  };
+
+  const renderItem = (item, handleFav) => {
+    console.log(item, 'item');
+    return (
+      <LinearGradient
+        colors={getRandomGradient()} // Apply random gradient colors
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={{
+          padding: 16,
+          marginVertical: 8,
+          borderRadius: 10,
+          elevation: 6,
+          marginHorizontal: 10,
+        }}>
+        <View className="flex-row items-center gap-2">
+          <Iconify
+            icon="iconamoon:category"
+            size={20}
+            color={theme.colors.appColor}
+          />
+          <CustomText
+            className="text-[13px] top-1"
+            style={{
+              fontFamily: fonts.Medium,
+              color: mode == 'light' ? theme.colors.outline : '#fff',
+            }}>
+            {item?.category}
+          </CustomText>
+        </View>
+        <TouchableOpacity
+          onPress={() => handleFav(item)} // Handle favorite toggle
+          style={{
+            position: 'absolute',
+            right: 12,
+            top: 12,
+            zIndex: 1,
+          }}>
+          <Iconify
+            icon="solar:heart-bold"
+            size={32}
+            color={theme.colors.appColor}
+          />
+        </TouchableOpacity>
+
+        <CustomText
+          className="text-[15px]"
+          style={{
+            fontFamily: fonts.SemiBold,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          Day {item?.day}:
+        </CustomText>
+        <CustomText
+          className="text-[18px]"
+          style={{
+            fontFamily: fonts.Medium,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          {item?.exercise}
+        </CustomText>
+        <CustomText
+          className="text-[13px]"
+          style={{
+            fontFamily: fonts.Regular,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          {item?.subtitle}
+        </CustomText>
+      </LinearGradient>
+    );
+  };
+
+  const handleFav = exercise => {
+    setFavExercise(prev => {
+      // If prev is null or undefined, default it to an empty array
+      const currentFavExercises = prev || [];
+      const isAlreadyFav = currentFavExercises?.some(
+        item => item?.day === exercise?.day,
+      );
+      if (isAlreadyFav) {
+        // Remove exercise from favorites
+        showToast('Removing Exercise from Favorite ..');
+        return currentFavExercises.filter(item => item.day !== exercise.day);
+      }
+    });
+  };
+
   return (
-    <ScrollView
-      style={[styles.tabContainer, {backgroundColor: theme.colors.background}]}>
-      <CustomText style={styles.text}>Exercise Content</CustomText>
-    </ScrollView>
+    <>
+      <View
+        style={[
+          styles.tabContainer,
+          {backgroundColor: theme.colors.background},
+        ]}>
+        {/* <CustomText style={styles.text}>Exercise Content</CustomText> */}
+        {favExercise && favExercise.length > 0 ? (
+          <FlatList
+            data={favExercise}
+            renderItem={({item}) => renderItem(item, handleFav)}
+            keyExtractor={item => item.day.toString()}
+          />
+        ) : (
+          <CustomText
+            className="text-[13px] top-1"
+            style={[
+              {
+                fontFamily: fonts.Medium,
+                color: mode == 'light' ? theme.colors.outline : '#fff',
+              },
+              styles.text,
+            ]}>
+            No exercises found!
+          </CustomText>
+        )}
+      </View>
+    </>
   );
 }
 
 // Nutrition Food Screen
-function NutritionScreen() {
+function NutritionScreen({favFood}) {
   let theme = useTheme();
 
   return (
@@ -35,6 +177,9 @@ function NutritionScreen() {
 // Main Bookmark Component
 export default function Bookmark() {
   let theme = useTheme();
+  const {favExercise, favFood} = useAuthContext();
+  console.log(favExercise, 'favExercise');
+
   return (
     <>
       <Header screenName={'Bookmark'} backIcon={false} />

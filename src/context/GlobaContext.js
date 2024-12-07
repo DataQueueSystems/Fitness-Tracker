@@ -1,6 +1,6 @@
 import {Alert, Linking, Platform, StyleSheet, Text, View} from 'react-native';
 import React, {createContext, useContext, useEffect, useState} from 'react';
-import NetInfo, {useNetInfoInstance} from '@react-native-community/netinfo';
+import NetInfo from '@react-native-community/netinfo';
 import {showToast} from '../../utils/Toast.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
@@ -12,6 +12,12 @@ export const AuthContextProvider = ({children}) => {
   const [count, setCount] = useState(0);
   const [ipAddress, setIpAddress] = useState(null);
 
+  // BMI category
+  const [bmi, setBmi] = useState(null);
+  //fav exercise
+  const [favExercise, setFavExercise] = useState([]);
+  const [favFood, setFavFood] = useState([]);
+
   const GetUserDetail = async () => {
     try {
       const userToken = await AsyncStorage.getItem('token');
@@ -20,7 +26,7 @@ export const AuthContextProvider = ({children}) => {
         return; // Exit if no token is found
       }
       await firestore()
-        .collection('conductor')
+        .collection('users')
         .doc(userToken)
         .onSnapshot(snapShot => {
           if (snapShot.exists) {
@@ -53,10 +59,10 @@ export const AuthContextProvider = ({children}) => {
     }
   };
 
-  // useEffect(() => {
-  //   GetUserDetail();
-  //   GetEndPoint();
-  // }, []);
+  useEffect(() => {
+    GetUserDetail();
+    GetEndPoint();
+  }, []);
 
   const Checknetinfo = async () => {
     const state = await NetInfo.fetch(); // Get the current network state
@@ -111,6 +117,28 @@ export const AuthContextProvider = ({children}) => {
     );
   };
 
+  const GetStoredBmi = async () => {
+    const userBMI = await AsyncStorage.getItem('BMI');
+    await setBmi(userBMI);
+  };
+  useEffect(() => {
+    GetStoredBmi();
+  }, []);
+
+  const GetStoredData = async () => {
+    const storedExercise = await AsyncStorage.getItem('Fav-Exercise');
+    const parsedFavs = storedExercise ? JSON.parse(storedExercise) : []; // Default to empty array if no saved data
+    console.log('Parsed Fav Exercise:', parsedFavs); // This should log a plain array
+    const storedFood = await AsyncStorage.getItem('Fav-Food');
+    await setFavExercise(parsedFavs); // No need for '|| []' since parsedFavs is already an array
+    await setFavFood(storedFood ? JSON.parse(storedFood) : []); // Ensure 'Fav-Food' is parsed as an array if necessary
+  };
+  
+
+  useEffect(() => {
+    GetStoredData();
+  }, []);
+
   return (
     <Authcontext.Provider
       value={{
@@ -129,6 +157,12 @@ export const AuthContextProvider = ({children}) => {
         setCount,
 
         ipAddress,
+
+        bmi,
+        setBmi,
+
+        favExercise, setFavExercise,
+        favFood,setFavFood
       }}>
       {children}
     </Authcontext.Provider>

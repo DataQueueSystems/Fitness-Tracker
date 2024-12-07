@@ -4,11 +4,15 @@ import {Iconify} from 'react-native-iconify';
 import {Button, TextInput, useTheme} from 'react-native-paper';
 import CustomText from '../../customText/CustomText';
 import {fonts} from '../../customText/fonts';
+import {showToast} from '../../../utils/Toast';
+import {useAuthContext} from '../../context/GlobaContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CalculateModal = ({visible, setModalVisible}) => {
   let theme = useTheme();
-  const [form, setForm] = useState({height: '', weight: ''}); // State for height and weight
+  const {setBmi} = useAuthContext();
 
+  const [form, setForm] = useState({height: '', weight: ''}); // State for height and weight
   const handleChange = (field, value) => {
     setForm({...form, [field]: value});
   };
@@ -17,15 +21,18 @@ const CalculateModal = ({visible, setModalVisible}) => {
     setModalVisible(false);
   };
 
-  const handleCalculate = () => {
-    // You can handle BMI calculation logic here
-    // const {height, weight} = form;
-    // if (height && weight) {
-    //   const bmi = weight / (height / 100) ** 2;
-    //   alert(`Your BMI is: ${bmi.toFixed(2)}`);
-    // } else {
-    //   alert('Please enter both height and weight.');
-    // }
+  const handleCalculate = async () => {
+    const {height, weight} = form;
+    if (height && weight) {
+      const bmi = weight / (height / 100) ** 2;
+      await setBmi(bmi);
+      await AsyncStorage.setItem('BMI', JSON.stringify(bmi));
+
+      handleClose();
+      // alert(`Your BMI is: ${bmi.toFixed(2)}`);
+    } else {
+      showToast('Please enter both height and weight.');
+    }
   };
 
   return (
@@ -102,7 +109,11 @@ const CalculateModal = ({visible, setModalVisible}) => {
             style={[styles.divider, {backgroundColor: theme.colors.lightGrey}]}
           />
           <TouchableOpacity onPress={handleClose} style={styles.cancelOption}>
-            <CustomText style={[styles.cancelText, {color: theme.colors.error,fontFamily: fonts.Regular,}]}>
+            <CustomText
+              style={[
+                styles.cancelText,
+                {color: theme.colors.error, fontFamily: fonts.Regular},
+              ]}>
               Cancel
             </CustomText>
           </TouchableOpacity>
@@ -142,7 +153,7 @@ const styles = StyleSheet.create({
   },
   inputContent: {
     height: 50,
-    fontFamily:'Poppins-Regular'
+    fontFamily: 'Poppins-Regular',
   },
   confirmView: {
     width: '100%',

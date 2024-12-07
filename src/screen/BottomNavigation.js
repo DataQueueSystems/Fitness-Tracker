@@ -49,6 +49,12 @@ const MyIcons = (route, focused, theme) => {
         color={theme.colors.outline}
       />
     );
+  } else if (route.name === 'Analyze') {
+    icons = focused ? (
+      <Iconify icon="proicons:graph" size={28} color={theme.colors.appColor} />
+    ) : (
+      <Iconify icon="proicons:graph" size={size} color={theme.colors.outline} />
+    );
   } else if (route.name === 'Profile') {
     icons = focused ? (
       <Iconify
@@ -132,6 +138,7 @@ const BottomNavigator = () => {
         })}>
         <Bottom.Screen name="Home" component={Home} />
         <Bottom.Screen name="Nutrition" component={Nutrition} />
+        <Bottom.Screen name="Analyze" component={Bookmark} />
         <Bottom.Screen name="Bookmark" component={Bookmark} />
         <Bottom.Screen name="Profile" component={Profile} />
       </Bottom.Navigator>

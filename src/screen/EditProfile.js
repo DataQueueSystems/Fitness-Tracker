@@ -18,36 +18,29 @@ import {Iconify} from 'react-native-iconify';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ImageModal from '../component/Modal/ImageModal';
 import {useAuthContext} from '../context/GlobaContext';
+import firestore from '@react-native-firebase/firestore';
+import {uploadImageToCloudinary} from '../cloudinary';
+
 export default function EditProfile() {
   let theme = useTheme();
   let navigation = useNavigation();
-  const {Checknetinfo} = useAuthContext();
+  const {Checknetinfo, userDetail} = useAuthContext();
 
   const [spinner, setSpinner] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const userData = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    height: '180', // in cm
-    weight: '75', // in kg
-    gender: 'Male',
-    password: '',
-    contact: '1234567890',
-    profile_image: 'https://example.com/profile-image.jpg',
-  };
-
   // Initialize state with the prepared object
   const [form, setForm] = useState({
-    name: userData?.name || '',
-    email: userData?.email || '',
-    height: userData?.height || '',
-    weight: userData?.email || '',
-    gender: userData?.height || '',
-    email: userData?.weight || '',
-    password: userData?.password || '',
-    contact: userData?.contact || '',
-    profile_image: userData?.profile_image || '',
+    name: userDetail?.name || '',
+    email: userDetail?.email || '',
+    height: userDetail?.height || '',
+    weight: userDetail?.email || '',
+    age: userDetail?.age || '',
+    gender: userDetail?.height || '',
+    email: userDetail?.weight || '',
+    password: userDetail?.password || '',
+    contact: userDetail?.contact || '',
+    profile_image: userDetail?.profile_image || '',
   });
 
   const [visible, setVisible] = useState(false);
@@ -58,7 +51,7 @@ export default function EditProfile() {
   // Function to handle opening the modal with animation
   const handlePrevImage = () => {
     setVisible(true);
-    let imageUri = userData?.profile_image?.imageUri;
+    let imageUri = userDetail?.profile_image?.imageUri;
     setPrevimage(selectedImageUri || imageUri);
     Animated.timing(opacityAnim, {
       toValue: 1,
@@ -90,6 +83,7 @@ export default function EditProfile() {
     if (!form.name) newErrors.name = 'Name is required';
     if (!form.weight) newErrors.weight = 'Weight is required';
     if (!form.height) newErrors.height = 'Height is required';
+    if (!form.age) newErrors.age = 'Age is required';
     if (!form.gender) newErrors.gender = 'Gender is required';
     if (!form.password) newErrors.password = 'Password is required';
     if (!form.contact) newErrors.contact = 'Contact number is required';
@@ -116,6 +110,34 @@ export default function EditProfile() {
     }
     try {
       if (validateForm()) {
+        let defaultData = {
+          ...form,
+          create_date: new Date().toISOString(), // Current date and time in ISO format
+        };
+
+        if (selectedImageUri) {
+          // Wait for the image upload to complete and get the image URL
+          const uploadedImageUrl = await uploadImageToCloudinary(
+            form?.name,
+            // form?.profile_image,
+            selectedImageUri,
+            'FitnessTrack',
+          );
+          defaultData.profile_image = uploadedImageUrl;
+          // If the image upload failed, handle it
+          if (!uploadedImageUrl) {
+            console.error('Image upload failed');
+            setSpinner(false);
+            return;
+          }
+        }
+        await firestore()
+          .collection('users')
+          .doc(userDetail?.id)
+          .update(defaultData);
+        // await navigation.goBack();
+        showToast('Profile Updated');
+        setSpinner(false);
       }
     } catch (error) {
       setSpinner(false);
@@ -247,6 +269,24 @@ export default function EditProfile() {
                 {errors?.gender}
               </CustomText>
             )}
+            <TextInput
+              label="Age"
+              value={form?.age}
+              onChangeText={value => handleChange('age', value)}
+              style={styles.input}
+              contentStyle={styles.inputContent}
+              mode="outlined"
+            />
+            {errors?.age && (
+              <CustomText
+                className="bottom-2"
+                style={[
+                  styles.errorText,
+                  {color: theme.colors.error, fontFamily: fonts.Light},
+                ]}>
+                {errors?.age}
+              </CustomText>
+            )}
 
             <TextInput
               label="Weight"
@@ -364,7 +404,8 @@ const styles = StyleSheet.create({
   },
   btn: {
     padding: 4,
-    marginTop: 20,
+    marginTop: 10,
     borderRadius: 16,
+    marginBottom: 40,
   },
 });

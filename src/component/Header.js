@@ -5,8 +5,6 @@ import {useTheme} from 'react-native-paper';
 import {View, StyleSheet} from 'react-native';
 
 const Header = ({screenName, backIcon}) => {
-  console.log(backIcon, 'backIcon');
-
   let theme = useTheme();
   let navigation = useNavigation();
   const BackNavigation = () => {
