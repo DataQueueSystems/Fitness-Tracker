@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Exercise() {
   const theme = useTheme();
-  const {bmi, setFavExercise,favExercise} = useAuthContext();
+  const {bmi, setFavExercise, favExercise} = useAuthContext();
   const [exercisePlan, setExercisePlan] = useState(null);
   const [category, setCategory] = useState(null);
 
@@ -33,70 +33,62 @@ export default function Exercise() {
           ['#14325a', '#4B4B59'], // Blue to dark grayish tone (contrast with dark appDark)
         ];
 
-  // Function to get a random gradient color
-  const getRandomGradient = () => {
-    const randomIndex = Math.floor(Math.random() * gradientColors.length);
-    return gradientColors[randomIndex];
-  };
-
-  const renderItem = (item, handleFav,) => {
-    console.log(favExercise,'favExercise');
-    
+  const renderItem = (item, handleFav) => {
     const isFav = favExercise.some(fav => fav?.day === item?.day); // Check if any object in favExercise has the same day
     return (
-    <LinearGradient
-      colors={getRandomGradient()} // Apply random gradient colors
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{
-        padding: 16,
-        marginVertical: 8,
-        borderRadius: 10,
-        elevation: 6,
-        marginHorizontal: 10,
-      }}>
-      <TouchableOpacity
-        onPress={() => handleFav(item)}
+      <LinearGradient
+        colors={gradientColors[0]} // Apply random gradient colors
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
         style={{
-          position: 'absolute', // `absolute` from Tailwind
-          right: 12, // `right-3` -> 3 * 4px = 12px
-          top: 12, // `top-3` -> 3 * 4px = 12px
-          zIndex: 1, // `zIndex-1`
+          padding: 16,
+          marginVertical: 8,
+          borderRadius: 10,
+          elevation: 6,
+          marginHorizontal: 10,
         }}>
-        <Iconify
-          icon="solar:heart-bold"
-          size={32}
-          color={isFav ?theme.colors.error: theme.colors.appColor} // Red if the item is favorited
+        <TouchableOpacity
+          onPress={() => handleFav(item)}
+          style={{
+            position: 'absolute', // `absolute` from Tailwind
+            right: 12, // `right-3` -> 3 * 4px = 12px
+            top: 12, // `top-3` -> 3 * 4px = 12px
+            zIndex: 1, // `zIndex-1`
+          }}>
+          <Iconify
+            icon="solar:heart-bold"
+            size={32}
+            color={isFav ? '#353434' : theme.colors.appColor} // Red if the item is favorited
+          />
+        </TouchableOpacity>
 
-        />
-      </TouchableOpacity>
-
-      <CustomText
-        className="text-[15px] "
-        style={{
-          fontFamily: fonts.SemiBold,
-          color: mode == 'light' ? theme.colors.outline : '#fff',
-        }}>
-        Day {item?.day}:
-      </CustomText>
-      <CustomText
-        className="text-[18px]"
-        style={{
-          fontFamily: fonts.Medium,
-          color: mode == 'light' ? theme.colors.outline : '#fff',
-        }}>
-        {item?.exercise}
-      </CustomText>
-      <CustomText
-        className="text-[13px]"
-        style={{
-          fontFamily: fonts.Regular,
-          color: mode == 'light' ? theme.colors.outline : '#fff',
-        }}>
-        {item?.subtitle}
-      </CustomText>
-    </LinearGradient>
-  )};
+        <CustomText
+          className="text-[15px] "
+          style={{
+            fontFamily: fonts.SemiBold,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          Day {item?.day}:
+        </CustomText>
+        <CustomText
+          className="text-[18px]"
+          style={{
+            fontFamily: fonts.Medium,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          {item?.exercise}
+        </CustomText>
+        <CustomText
+          className="text-[13px]"
+          style={{
+            fontFamily: fonts.Regular,
+            color: mode == 'light' ? theme.colors.outline : '#fff',
+          }}>
+          {item?.subtitle}
+        </CustomText>
+      </LinearGradient>
+    );
+  };
 
   function getExercisePlan(bmi) {
     if (bmi < 18.5) {
@@ -429,14 +421,18 @@ export default function Exercise() {
     }
   }, [bmi]);
 
-  const handleFav = async (exercise) => {
+  const handleFav = async exercise => {
     setFavExercise(prev => {
       const currentFavExercises = prev || []; // Ensure it's always an array
-      const isAlreadyFav = currentFavExercises.some(item => item.day === exercise.day);
+      const isAlreadyFav = currentFavExercises.some(
+        item => item.day === exercise.day,
+      );
       if (isAlreadyFav) {
         // Remove exercise from favorites
         showToast('Removing Exercise from Favorite ..');
-        const updatedFavs = currentFavExercises.filter(item => item.day !== exercise.day);
+        const updatedFavs = currentFavExercises.filter(
+          item => item.day !== exercise.day,
+        );
         AsyncStorage.setItem('Fav-Exercise', JSON.stringify(updatedFavs));
         return updatedFavs;
       } else {
@@ -447,7 +443,7 @@ export default function Exercise() {
       }
     });
   };
-  
+
   return (
     <View>
       <FlatList

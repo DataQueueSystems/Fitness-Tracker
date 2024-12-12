@@ -6,9 +6,10 @@ import {Iconify} from 'react-native-iconify';
 import Home from './Home.js';
 import CustomText from '../customText/CustomText.js';
 import {fonts} from '../customText/fonts.js';
-import Bookmark from './BookMark.js';
+import Favorite from './Favorite.js';
 import Profile from './Profile.js';
 import Nutrition from './Nutrition.js';
+import Analyze from './Analyze.js';
 
 const Bottom = createBottomTabNavigator();
 const MyIcons = (route, focused, theme) => {
@@ -35,7 +36,7 @@ const MyIcons = (route, focused, theme) => {
     ) : (
       <Iconify icon="ep:food" size={size} color={theme.colors.outline} />
     );
-  } else if (route.name === 'Bookmark') {
+  } else if (route.name === 'Favorite') {
     icons = focused ? (
       <Iconify
         icon="solar:heart-linear"
@@ -138,8 +139,8 @@ const BottomNavigator = () => {
         })}>
         <Bottom.Screen name="Home" component={Home} />
         <Bottom.Screen name="Nutrition" component={Nutrition} />
-        <Bottom.Screen name="Analyze" component={Bookmark} />
-        <Bottom.Screen name="Bookmark" component={Bookmark} />
+        <Bottom.Screen name="Analyze" component={Analyze} />
+        <Bottom.Screen name="Favorite" component={Favorite} />
         <Bottom.Screen name="Profile" component={Profile} />
       </Bottom.Navigator>
     </>

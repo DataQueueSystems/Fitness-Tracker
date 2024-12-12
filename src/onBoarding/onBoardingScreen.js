@@ -27,6 +27,7 @@ const FirstScreen = theme => ({
         style={{
           fontFamily: fonts.Bold,
           fontSize: 17,
+          color:'#bdb9b9'
         }}>
         Let's Begin Your Journey
       </CustomText>
@@ -40,6 +41,8 @@ const FirstScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
+          color:'#bdb9b9'
+
           }}>
           Start tracking your fitness goals, monitor progress, and receive
           personalized exercise and diet plans tailored just for you.
@@ -72,6 +75,8 @@ const SecondScreen = theme => ({
         style={{
           fontFamily: fonts.Bold,
           fontSize: 18,
+          color:'#bdb9b9'
+
         }}>
         Every Step of the Way
       </CustomText>
@@ -85,6 +90,8 @@ const SecondScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
+          color:'#bdb9b9'
+
           }}>
           Monitor your workouts, log your meals, and stay motivated with
           real-time updates on your fitness journey.
@@ -117,6 +124,8 @@ const ThirdScreen = theme => ({
         style={{
           fontFamily: fonts.Bold,
           fontSize: 18,
+          color:'#bdb9b9'
+
         }}>
         Tailored to You
       </CustomText>
@@ -130,6 +139,8 @@ const ThirdScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
+          color:'#bdb9b9'
+
           }}>
           Based on your age, weight, and height, receive customized exercise
           plans, diet recommendations, and weekly fitness tips.

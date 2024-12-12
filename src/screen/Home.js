@@ -51,8 +51,6 @@ export default function Home() {
     }
   }, []);
 
-  console.log(bmi, 'bmis');
-
   return (
     <>
       <View
@@ -69,9 +67,7 @@ export default function Home() {
               <TouchableOpacity onPress={handleNavigate}>
                 <Image
                   className="rounded-full"
-                  source={{
-                    uri: userDetail?.profile_image?.imageUri,
-                  }}
+                  source={require('../../assets/Image/defaultAvtar.jpg')}
                   style={{width: 45, height: 45}}
                 />
               </TouchableOpacity>
@@ -87,7 +83,7 @@ export default function Home() {
                     fontFamily: fonts.Bold,
                     color: theme.colors.appColor,
                   }}>
-                  {userDetail?.name}
+                  {userDetail?.Name}
                 </CustomText>
               </View>
             </View>
