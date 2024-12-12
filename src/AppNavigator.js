@@ -12,6 +12,7 @@ import onBoardingScreen from './onBoarding/onBoardingScreen';
 import Register from './auth/Register';
 import BottomNavigator from './screen/BottomNavigation';
 import EditProfile from './screen/EditProfile';
+import NutritionForm from './component/Modal/NutritionForm';
 const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   const {isLogin, setIsLogin} = useAuthContext();
@@ -62,6 +63,7 @@ export default function AppNavigator() {
             <Stack.Screen name="BottomTab" component={BottomNavigator} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="NutritionForm" component={NutritionForm} />
           </>
         )}
       </Stack.Navigator>

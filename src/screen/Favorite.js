@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -16,7 +16,9 @@ import {fonts} from '../customText/fonts';
 import {useAuthContext} from '../context/GlobaContext';
 import LinearGradient from 'react-native-linear-gradient';
 import {Iconify} from 'react-native-iconify';
-import { showToast } from '../../utils/Toast';
+import {showToast} from '../../utils/Toast';
+import RecommendedFood from '../component/RecommandedFood';
+import axios from 'axios';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -44,7 +46,6 @@ function ExerciseScreen() {
   };
 
   const renderItem = (item, handleFav) => {
-    console.log(item, 'item');
     return (
       <LinearGradient
         colors={getRandomGradient()} // Apply random gradient colors
@@ -140,6 +141,8 @@ function ExerciseScreen() {
         {/* <CustomText style={styles.text}>Exercise Content</CustomText> */}
         {favExercise && favExercise.length > 0 ? (
           <FlatList
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             data={favExercise}
             renderItem={({item}) => renderItem(item, handleFav)}
             keyExtractor={item => item.day.toString()}
@@ -165,24 +168,63 @@ function ExerciseScreen() {
 // Nutrition Food Screen
 function NutritionScreen({favFood}) {
   let theme = useTheme();
+  const {ipAddress, userDetail} = useAuthContext();
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchMeals = async () => {
+    try {
+      let data = {
+        email: userDetail?.Email,
+      };
+      const response = await axios.post(`${ipAddress}/userViewLod`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const responseData = response.data;
+      if (responseData.meals) {
+        setMeals(responseData.meals);
+      } else if (responseData.error) {
+        console.error(responseData.error);
+      }
+    } catch (error) {
+      console.error('Error fetching meals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeals();
+  }, []);
 
   return (
     <ScrollView
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       style={[styles.tabContainer, {backgroundColor: theme.colors.background}]}>
-      <CustomText style={styles.text}>Nutrition Food Content</CustomText>
+      {/* Header */}
+      <View>
+        <CustomText style={{fontFamily: fonts.Regular}}>
+          Keep track of your meals and nutrition. Once you log your food, it
+          will appear here for easy tracking and reference.
+        </CustomText>
+      </View>
+
+      <RecommendedFood forDelete={true} nutritionFood={meals} />
     </ScrollView>
   );
 }
 
-// Main Bookmark Component
-export default function Bookmark() {
+// Main Favorite Component
+export default function Favorite() {
   let theme = useTheme();
   const {favExercise, favFood} = useAuthContext();
-  console.log(favExercise, 'favExercise');
 
   return (
     <>
-      <Header screenName={'Bookmark'} backIcon={false} />
+      <Header screenName={'Favorite'} backIcon={false} />
       <View
         style={[
           styles.mainContainer,

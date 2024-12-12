@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {Button, useTheme} from 'react-native-paper';
@@ -13,13 +14,13 @@ import CustomText from '../customText/CustomText';
 import Header from '../component/Header';
 import {useAuthContext} from '../context/GlobaContext';
 import {fonts} from '../customText/fonts';
-import firestore from '@react-native-firebase/firestore';
 import {showToast} from '../../utils/Toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function Login() {
   let theme = useTheme();
-  const {setIsLogin, Checknetinfo, setUserDetail} = useAuthContext();
+  const {setIsLogin, Checknetinfo, setUserDetail, ipAddress} = useAuthContext();
   let navigation = useNavigation();
 
   const [spinner, setSpinner] = useState(false);
@@ -38,39 +39,6 @@ export default function Login() {
     }));
   };
 
-  const CheckDataBase = async () => {
-    setSpinner(true);
-    let isConnected = await Checknetinfo();
-    if (!isConnected) {
-      setSpinner(false);
-      return;
-    };
-    try {
-      const snapShot = await firestore().collection('users').get();
-      if (snapShot.empty) {
-        showToast('No user found');
-        return;
-      }
-      let userDoc = snapShot.docs.find(doc => {
-        const data = doc.data();
-        return data.email == form.email && data.password == form.password;
-      });
-      if (!userDoc) {
-        setSpinner(false);
-        showToast('Invalid email or password');
-        return;
-      } else {
-        let userData = {id: userDoc.id, ...userDoc.data()};
-        await setUserDetail(userData);
-        await AsyncStorage.setItem('token', userData.id);
-        AsyncStorage.setItem('IsLogin', 'true');
-        setIsLogin(false);
-      }
-    } catch (error) {
-      showToast('Something went wrong');
-    }
-  };
-
   const validateForm = () => {
     const newErrors = {};
     if (!form.email) newErrors.email = 'Email is required';
@@ -81,14 +49,43 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-    setSpinner(true);
-    const isConnected = await Checknetinfo();
-    if (!isConnected) {
-      setSpinner(false);
-      return;
-    }
     if (validateForm()) {
-      let CanAdd = await CheckDataBase(); // Checks for existing user
+      setSpinner(true);
+      const userForm = new FormData();
+      userForm.append('Email', form.email); // Append the email field
+      userForm.append('Password', form.password); // Append the password field
+      try {
+        // Send POST request with userForm
+        let response = await axios.post(`${ipAddress}/UserLogin`, userForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Ensure Flask processes it as FormData
+          },
+        });
+        if (response.data.success) {
+          showToast(response.data.message); // Show success message
+          AsyncStorage.setItem('IsLogin', 'true');
+          setIsLogin(false);
+          let userData=response.data.user;
+          console.log(userData,'userData');
+          AsyncStorage.setItem('user',JSON.stringify(userData));
+          setUserDetail(userData);  // Update the state with user data
+          setSpinner(false);
+        } else {
+          showToast(response.data.message); // Show failure message
+        }
+      } catch (error) {
+        showToast('something wrong');
+        // console.error('Error:', error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            showToast(
+              `${error.response.data.message || 'Something went wrong'}`,
+            );
+          } else {
+            showToast('Network error, please try again');
+          }
+        }
+      }
     } else {
       showToast('Some invalid data');
     }

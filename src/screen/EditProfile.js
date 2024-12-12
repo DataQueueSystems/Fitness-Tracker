@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Image,
   ScrollView,
@@ -20,6 +21,7 @@ import ImageModal from '../component/Modal/ImageModal';
 import {useAuthContext} from '../context/GlobaContext';
 import firestore from '@react-native-firebase/firestore';
 import {uploadImageToCloudinary} from '../cloudinary';
+import {showToast} from '../../utils/Toast';
 
 export default function EditProfile() {
   let theme = useTheme();
@@ -31,51 +33,15 @@ export default function EditProfile() {
 
   // Initialize state with the prepared object
   const [form, setForm] = useState({
-    name: userDetail?.name || '',
-    email: userDetail?.email || '',
+    name: userDetail?.Name || '',
+    email: userDetail?.Email || '',
     height: userDetail?.height || '',
-    weight: userDetail?.email || '',
+    weight: userDetail?.weight || '',
     age: userDetail?.age || '',
-    gender: userDetail?.height || '',
-    email: userDetail?.weight || '',
-    password: userDetail?.password || '',
+    gender: userDetail?.gender || '',
+    password: userDetail?.Password || '',
     contact: userDetail?.contact || '',
-    profile_image: userDetail?.profile_image || '',
   });
-
-  const [visible, setVisible] = useState(false);
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const [previmage, setPrevimage] = useState(null);
-  const [selectedImageUri, setSelectedImageUri] = useState(null);
-
-  // Function to handle opening the modal with animation
-  const handlePrevImage = () => {
-    setVisible(true);
-    let imageUri = userDetail?.profile_image?.imageUri;
-    setPrevimage(selectedImageUri || imageUri);
-    Animated.timing(opacityAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-  // Function to pick an image from the library
-  const selectImage = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-    };
-    launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const imageUri = response.assets[0].uri;
-        setSelectedImageUri(imageUri);
-      }
-    });
-  };
 
   // Simple validation function
   const validateForm = () => {
@@ -114,23 +80,6 @@ export default function EditProfile() {
           ...form,
           create_date: new Date().toISOString(), // Current date and time in ISO format
         };
-
-        if (selectedImageUri) {
-          // Wait for the image upload to complete and get the image URL
-          const uploadedImageUrl = await uploadImageToCloudinary(
-            form?.name,
-            // form?.profile_image,
-            selectedImageUri,
-            'FitnessTrack',
-          );
-          defaultData.profile_image = uploadedImageUrl;
-          // If the image upload failed, handle it
-          if (!uploadedImageUrl) {
-            console.error('Image upload failed');
-            setSpinner(false);
-            return;
-          }
-        }
         await firestore()
           .collection('users')
           .doc(userDetail?.id)
@@ -157,44 +106,15 @@ export default function EditProfile() {
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
-            <TouchableOpacity
-              onPress={handlePrevImage}
-              activeOpacity={0.8}
-              style={styles.imageView}>
-              {selectedImageUri ? (
-                <Image
-                  source={{uri: selectedImageUri}}
-                  style={[
-                    styles.profileImage,
-                    {borderColor: theme.colors.onBackground},
-                  ]}
-                />
-              ) : form?.profile_image?.imageUri ? (
-                <Image
-                  source={{uri: form?.profile_image?.imageUri}}
-                  style={[
-                    styles.profileImage,
-                    {borderColor: theme.colors.appcolor},
-                  ]}
-                />
-              ) : (
-                <Image
-                  source={require('../../assets/Image/defaultAvtar.jpg')}
-                  style={[
-                    styles.profileImage,
-                    {borderColor: theme.colors.onBackground},
-                  ]}
-                />
-              )}
-
-              <TouchableOpacity onPress={selectImage} style={[styles.editView]}>
-                <Iconify
-                  icon="basil:edit-outline"
-                  size={25}
-                  color={theme.colors.appColor}
-                />
-              </TouchableOpacity>
-            </TouchableOpacity>
+            <View activeOpacity={0.8} style={styles.imageView}>
+              <Image
+                source={require('../../assets/Image/defaultAvtar.jpg')}
+                style={[
+                  styles.profileImage,
+                  {borderColor: theme.colors.onBackground},
+                ]}
+              />
+            </View>
 
             <TextInput
               label="Name"
@@ -364,12 +284,7 @@ export default function EditProfile() {
         </View>
       </View>
 
-      <ImageModal
-        visible={visible}
-        image={previmage}
-        opacityAnim={opacityAnim}
-        setVisible={setVisible}
-      />
+      
     </>
   );
 }
@@ -383,12 +298,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignSelf: 'center',
+    marginBottom:15
   },
-  editView: {
-    alignSelf: 'flex-end',
-    right: 14,
-    top: -10,
-  },
+
   profileImage: {
     width: 100,
     height: 100,

@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {Divider, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import CustomText from '../customText/CustomText';
@@ -19,30 +19,13 @@ import ImageModal from '../component/Modal/ImageModal';
 
 export default function Profile() {
   let theme = useTheme();
-  const {userDetail} = useAuthContext();
+  const {userDetail, handleLogout} = useAuthContext();
+
   let navigation = useNavigation();
   let size = 30;
   const handleEdit = () => {
     navigation.navigate('EditProfile');
   };
-
-  const [visible, setVisible] = useState(false);
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const [previmage, setPrevimage] = useState(null);
-  const [selectedImageUri, setSelectedImageUri] = useState(null);
-
-  // Function to handle opening the modal with animation
-  const handlePrevImage = () => {
-    setVisible(true);
-    let imageUri = userDetail?.profile_image?.imageUri;
-    setPrevimage(selectedImageUri || imageUri);
-    Animated.timing(opacityAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
 
   return (
     <>
@@ -56,37 +39,26 @@ export default function Profile() {
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
-            <View className="items-end right-3 top-3">
+            <View className="flex-row justify-end gap-2.5">
               <Iconify
-                icon="fluent:edit-32-filled"
-                size={28}
+                icon="basil:edit-outline"
+                size={30}
                 color={theme.colors.appColor}
                 onPress={handleEdit}
               />
+              <Iconify
+                icon="hugeicons:logout-03"
+                size={30}
+                color={theme.colors.appColor}
+                onPress={handleLogout}
+              />
             </View>
             <View className="flex-column items-center justify-center space-y-3 my-4">
-              {userDetail?.profile_image?.imageUri ? (
-                <TouchableOpacity 
-                onPress={handlePrevImage}
-                >
-  <Image
-                  source={{uri: userDetail?.profile_image?.imageUri}}
-                  className="rounded-full"
-                  style={{width: 100, height: 100}}
-                />
-                </TouchableOpacity>
-              
-              ) : (
-                <TouchableOpacity 
-                onPress={handlePrevImage}
-                >
-                <Image
-                  source={require('../../assets/Image/defaultAvtar.jpg')}
-                  className="rounded-full"
-                  style={{width: 100, height: 100}}
-                />
-                </TouchableOpacity>
-              )}
+              <Image
+                source={require('../../assets/Image/defaultAvtar.jpg')}
+                className="rounded-full"
+                style={{width: 100, height: 100}}
+              />
 
               <CustomText
                 className="text-[19px]"
@@ -94,7 +66,7 @@ export default function Profile() {
                   fontFamily: fonts.SemiBold,
                   color: theme.colors.appColor,
                 }}>
-                {userDetail?.name}
+                {userDetail?.Name}
               </CustomText>
             </View>
 
@@ -137,7 +109,7 @@ export default function Profile() {
                       fontFamily: fonts.Regular,
                       color: theme.colors.onBackground,
                     }}>
-                    {userDetail?.email}
+                    {userDetail?.Email}
                   </CustomText>
                 </View>
                 <View className=" flex-row justify-between items-center my-2">
@@ -275,13 +247,6 @@ export default function Profile() {
           </ScrollView>
         </View>
       </View>
-
-      <ImageModal
-        visible={visible}
-        image={previmage}
-        opacityAnim={opacityAnim}
-        setVisible={setVisible}
-      />
     </>
   );
 }

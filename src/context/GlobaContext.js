@@ -18,24 +18,15 @@ export const AuthContextProvider = ({children}) => {
   const [favExercise, setFavExercise] = useState([]);
   const [favFood, setFavFood] = useState([]);
 
+
   const GetUserDetail = async () => {
     try {
-      const userToken = await AsyncStorage.getItem('token');
-      if (!userToken) {
-        console.warn('No user token found');
-        return; // Exit if no token is found
+      const getData = await AsyncStorage.getItem('user');
+      if(getData!==null){
+        let userDetail=await JSON.parse(getData)
+        console.log(userDetail,'userDetail');
+        setUserDetail(userDetail)
       }
-      await firestore()
-        .collection('users')
-        .doc(userToken)
-        .onSnapshot(snapShot => {
-          if (snapShot.exists) {
-            const getData = {...snapShot.data(), id: snapShot.id};
-            setUserDetail(getData); // Set user details if the account is active
-          } else {
-            console.warn('User document does not exist');
-          }
-        });
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
@@ -55,7 +46,7 @@ export const AuthContextProvider = ({children}) => {
           }
         });
     } catch (error) {
-      console.log('error when getting endPoint : ', error);
+      // console.log('error when getting endPoint : ', error);
     }
   };
 
@@ -139,6 +130,7 @@ export const AuthContextProvider = ({children}) => {
     GetStoredData();
   }, []);
 
+
   return (
     <Authcontext.Provider
       value={{
@@ -162,7 +154,8 @@ export const AuthContextProvider = ({children}) => {
         setBmi,
 
         favExercise, setFavExercise,
-        favFood,setFavFood
+        favFood,setFavFood,
+        
       }}>
       {children}
     </Authcontext.Provider>

@@ -13,19 +13,18 @@ import CustomText from '../customText/CustomText';
 import Header from '../component/Header';
 import {useAuthContext} from '../context/GlobaContext';
 import {fonts} from '../customText/fonts';
-import firestore from '@react-native-firebase/firestore';
 import {showToast} from '../../utils/Toast';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function Register() {
   let theme = useTheme();
-  const {setIsLogin, Checknetinfo, setUserDetail} = useAuthContext();
+  const {setIsLogin, Checknetinfo, setUserDetail, ipAddress} = useAuthContext();
   let navigation = useNavigation();
   const [spinner, setSpinner] = useState(false);
   const [errors, setErrors] = useState({});
 
   const [form, setForm] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
   });
@@ -39,44 +38,9 @@ export default function Register() {
     }));
   };
 
-  const CheckDataBase = async () => {
-    setSpinner(true);
-    let isConnected = await Checknetinfo();
-    if (!isConnected) {
-      setSpinner(false);
-      return false;
-    }
-    try {
-      const snapShot = await firestore().collection('users').get();
-      if (snapShot.empty) {
-        showToast('No user found');
-        setSpinner(false);
-        return false;
-      }
-      // Flags to track existence of each field
-      let emailExists = false;
-      // Check each document for matches on the given fields
-      snapShot.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.email === form.email) emailExists = true;
-      });
-
-      let newErrors = {};
-      // Display relevant messages for each existing field
-      if (emailExists) newErrors.email = 'Email already exists.';
-      setSpinner(false);
-      // If any of the fields exist, return false; otherwise, return true
-      return !emailExists;
-    } catch (error) {
-      showToast('Something went wrong');
-      setSpinner(false);
-      return false;
-    }
-  };
-
   const validateForm = () => {
     const newErrors = {};
-    if (!form.name) newErrors.name = 'Name is required';
+    if (!form.username) newErrors.username = 'Username is required';
     if (!form.email) newErrors.email = 'Email is required';
     if (!form.password) newErrors.password = 'Password is required';
     setErrors(newErrors);
@@ -86,27 +50,41 @@ export default function Register() {
 
   const handleRegister = async () => {
     if (validateForm()) {
-      let CanAdd = await CheckDataBase(); // Checks for existing user
-      if (CanAdd) {
-        try {
-          // Prepare default data for new user
-          let defaultData = {
-            ...form,
-            Status: 'Active',
-            create_date: new Date().toISOString(), // Current date and time in ISO format
-          };
-          // Add new user to Firestore
-          await firestore().collection('users').add(defaultData);
-          showToast('Registration successful!');
+      setSpinner(true);
+
+      const userForm = new FormData();
+      userForm.append('Name', form.username); // Append the username field
+      userForm.append('Email', form.email); // Append the email field
+      userForm.append('Password', form.password); // Append the password field
+      try {
+        // Send POST request with userForm
+        let response = await axios.post(
+          `${ipAddress}/RegistrationNewUser`,
+          userForm,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data', // Ensure Flask processes it as FormData
+            },
+          },
+        );
+        if (response.data.success) {
+          showToast(response.data.message); // Show success message
           navigation.goBack();
-        } catch (error) {
-          showToast('Error creating user');
-        } finally {
-          setSpinner(false);
+          setSpinner(true);
+        } else {
+          showToast(response.data.message); // Show failure message
         }
-      } else {
-        showToast('User already exists');
-        setSpinner(false);
+      } catch (error) {
+        // console.error('Error:', error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            showToast(
+              `${error.response.data.message || 'Something went wrong'}`,
+            );
+          } else {
+            showToast('Network error, please try again');
+          }
+        }
       }
     } else {
       showToast('Some invalid data');
@@ -156,21 +134,21 @@ export default function Register() {
                   borderColor: theme.colors.onBackground,
                 },
               ]}
-              placeholder="Name"
+              placeholder="User name"
               placeholderTextColor="#888"
-              keyboardType="name"
-              onChangeText={value => handleChange('name', value)}
-              value={form?.name}
+              keyboardType="username"
+              onChangeText={value => handleChange('username', value)}
+              value={form?.username}
             />
 
-            {errors.name && (
+            {errors.username && (
               <CustomText
                 className="bottom-2"
                 style={[
                   styles.errorText,
                   {color: theme.colors.error, fontFamily: fonts.Light},
                 ]}>
-                {errors.name}
+                {errors.username}
               </CustomText>
             )}
 
