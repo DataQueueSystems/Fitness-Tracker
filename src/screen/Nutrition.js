@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import CustomText from '../customText/CustomText';
@@ -23,13 +23,36 @@ export default function Nutrition() {
   const [spinner, setSpinner] = useState(false);
   const [nutritionFood, setNutritionFood] = useState(null);
   const [userdietDetail, setUserdietDetail] = useState(null);
-
   // Navigation handler for the "Find Nutrition Food" button
   const handleFindNutritionFood = async () => {
     setSpinner(true);
-    await navigation.navigate('NutritionForm', {setNutritionFood,setUserdietDetail});
+    await navigation.navigate('NutritionForm', {
+      setNutritionFood,
+      setUserdietDetail,
+    });
     setSpinner(false);
   };
+  const [totalDetail, setTotalDetail] = useState(null);
+  useEffect(() => {
+    const calculateTotals = () => {
+      return nutritionFood.reduce(
+        (totals, item) => {
+          if (item && item?.Calories !== null)
+            totals.Calories += item?.Calories || 0;
+          if (item && item?.Protein !== null)
+            totals.Protein += item?.Protein || 0;
+          return totals;
+        },
+        {Calories: 0, Protein: 0},
+      );
+    };
+
+    if (nutritionFood != null) {
+      let totalData = calculateTotals();
+      setTotalDetail(totalData);
+    }
+  }, [nutritionFood]);
+
   return (
     <>
       <View
@@ -135,7 +158,7 @@ export default function Nutrition() {
                         <CustomText
                           className="text-md"
                           style={{fontFamily: fonts.Regular, width: 120}}>
-                          Protein
+                          Protein {totalDetail ? totalDetail?.Protein : ''} g
                         </CustomText>
                       </View>
                     </View>
@@ -161,7 +184,7 @@ export default function Nutrition() {
                         <CustomText
                           className="text-md"
                           style={{fontFamily: fonts.Regular, width: 120}}>
-                          Calories
+                          Calories {totalDetail ? totalDetail?.Calories : ''} kcal
                         </CustomText>
                       </View>
                     </View>
@@ -184,7 +207,10 @@ export default function Nutrition() {
                   </CustomText>
                 </Animated.View>
 
-                <RecommendedFood nutritionFood={nutritionFood} userdietDetail={userdietDetail}/>
+                <RecommendedFood
+                  nutritionFood={nutritionFood}
+                  userdietDetail={userdietDetail}
+                />
               </>
             )}
           </ScrollView>
@@ -192,13 +218,6 @@ export default function Nutrition() {
       </View>
     </>
   );
-}
-
-{
-  /* <img src="static/carb.png"  style="width:50px;height:50px">  
-    <img src="static/food.png"  style="width:50px;height:50px">
-     <img src="static/kcal.png" style="width:50px;height:50px">
-    */
 }
 
 const styles = StyleSheet.create({

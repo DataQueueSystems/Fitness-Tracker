@@ -10,9 +10,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CalculateModal = ({visible, setModalVisible}) => {
   let theme = useTheme();
-  const {setBmi} = useAuthContext();
-
-  const [form, setForm] = useState({height: '', weight: ''}); // State for height and weight
+  const {setBmi, setUserDetail, userDetail} = useAuthContext();
+  let userHeight = userDetail ? userDetail?.height : '';
+  let userWeight = userDetail ? userDetail?.weight : '';
+  const [form, setForm] = useState({height: userHeight, weight: userWeight}); // State for height and weight
   const handleChange = (field, value) => {
     setForm({...form, [field]: value});
   };
@@ -20,9 +21,11 @@ const CalculateModal = ({visible, setModalVisible}) => {
   const handleClose = () => {
     setModalVisible(false);
   };
-
   const handleCalculate = async () => {
     const {height, weight} = form;
+    let updateData = {...userDetail, height, weight};
+    AsyncStorage.setItem('user', JSON.stringify(updateData));
+    setUserDetail(updateData);
     if (height && weight) {
       const bmi = weight / (height / 100) ** 2;
       await setBmi(bmi);

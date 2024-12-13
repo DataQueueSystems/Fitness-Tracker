@@ -4,6 +4,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {showToast} from '../../utils/Toast.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
+import axios from 'axios';
 
 const Authcontext = createContext();
 export const AuthContextProvider = ({children}) => {
@@ -18,14 +19,12 @@ export const AuthContextProvider = ({children}) => {
   const [favExercise, setFavExercise] = useState([]);
   const [favFood, setFavFood] = useState([]);
 
-
   const GetUserDetail = async () => {
     try {
       const getData = await AsyncStorage.getItem('user');
-      if(getData!==null){
-        let userDetail=await JSON.parse(getData)
-        console.log(userDetail,'userDetail');
-        setUserDetail(userDetail)
+      if (getData !== null) {
+        let userDetail = await JSON.parse(getData);
+        setUserDetail(userDetail);
       }
     } catch (error) {
       console.error('Error fetching user details:', error);
@@ -45,9 +44,7 @@ export const AuthContextProvider = ({children}) => {
             console.warn('User document does not exist');
           }
         });
-    } catch (error) {
-      // console.log('error when getting endPoint : ', error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -81,7 +78,6 @@ export const AuthContextProvider = ({children}) => {
       ],
     );
   };
-
   const handleLogout = () => {
     Alert.alert(
       'Logout', //title
@@ -119,17 +115,49 @@ export const AuthContextProvider = ({children}) => {
   const GetStoredData = async () => {
     const storedExercise = await AsyncStorage.getItem('Fav-Exercise');
     const parsedFavs = storedExercise ? JSON.parse(storedExercise) : []; // Default to empty array if no saved data
-    console.log('Parsed Fav Exercise:', parsedFavs); // This should log a plain array
     const storedFood = await AsyncStorage.getItem('Fav-Food');
     await setFavExercise(parsedFavs); // No need for '|| []' since parsedFavs is already an array
     await setFavFood(storedFood ? JSON.parse(storedFood) : []); // Ensure 'Fav-Food' is parsed as an array if necessary
   };
-  
+
+  const [meals, setMeals] = useState([]);
 
   useEffect(() => {
     GetStoredData();
   }, []);
-
+  const fetchMeals = async () => {
+    try {
+      if (!userDetail?.Email || !ipAddress) {
+        console.error('Missing email or IP address.');
+        return; // Early exit if userDetail or ipAddress is not available
+      }
+      
+      const data = { email: userDetail.Email };
+      
+      const response = await axios.post(`${ipAddress}/userViewLod`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const responseData = response.data;
+      if (responseData.meals) {
+        setMeals(responseData.meals);
+      } else if (responseData.error) {
+        console.error('API Error:', responseData.error);
+      }
+    } catch (error) {
+      console.error('Error fetching meals:', error);
+    } finally {
+    }
+  };
+  useEffect(() => {
+    // Only call fetchMeals when both userDetail and ipAddress are available
+    if (userDetail && ipAddress) {
+      fetchMeals();
+    }
+  }, [userDetail, ipAddress, count]); // Add userDetail and ipAddress as dependencies
+  
 
   return (
     <Authcontext.Provider
@@ -146,6 +174,7 @@ export const AuthContextProvider = ({children}) => {
         handleLogout,
 
         gotoSetting,
+        count,
         setCount,
 
         ipAddress,
@@ -153,9 +182,11 @@ export const AuthContextProvider = ({children}) => {
         bmi,
         setBmi,
 
-        favExercise, setFavExercise,
-        favFood,setFavFood,
-        
+        favExercise,
+        setFavExercise,
+        favFood,
+        setFavFood,
+        meals, setMeals
       }}>
       {children}
     </Authcontext.Provider>

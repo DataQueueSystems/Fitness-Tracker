@@ -9,7 +9,7 @@ import {fonts} from '../customText/fonts.js';
 import Favorite from './Favorite.js';
 import Profile from './Profile.js';
 import Nutrition from './Nutrition.js';
-import Analyze from './Analyze.js';
+import Compare from './Compare.js';
 
 const Bottom = createBottomTabNavigator();
 const MyIcons = (route, focused, theme) => {
@@ -50,11 +50,11 @@ const MyIcons = (route, focused, theme) => {
         color={theme.colors.outline}
       />
     );
-  } else if (route.name === 'Analyze') {
+  } else if (route.name === 'Compare') {
     icons = focused ? (
-      <Iconify icon="proicons:graph" size={28} color={theme.colors.appColor} />
+      <Iconify icon="fluent:branch-compare-20-regular" size={28} color={theme.colors.appColor} />
     ) : (
-      <Iconify icon="proicons:graph" size={size} color={theme.colors.outline} />
+      <Iconify icon="fluent:branch-compare-20-regular" size={size} color={theme.colors.outline} />
     );
   } else if (route.name === 'Profile') {
     icons = focused ? (
@@ -139,7 +139,7 @@ const BottomNavigator = () => {
         })}>
         <Bottom.Screen name="Home" component={Home} />
         <Bottom.Screen name="Nutrition" component={Nutrition} />
-        <Bottom.Screen name="Analyze" component={Analyze} />
+        <Bottom.Screen name="Compare" component={Compare} />
         <Bottom.Screen name="Favorite" component={Favorite} />
         <Bottom.Screen name="Profile" component={Profile} />
       </Bottom.Navigator>
