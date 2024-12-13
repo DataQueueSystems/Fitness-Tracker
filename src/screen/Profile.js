@@ -20,7 +20,6 @@ import ImageModal from '../component/Modal/ImageModal';
 export default function Profile() {
   let theme = useTheme();
   const {userDetail, handleLogout} = useAuthContext();
-
   let navigation = useNavigation();
   let size = 30;
   const handleEdit = () => {

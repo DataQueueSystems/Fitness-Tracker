@@ -65,17 +65,15 @@ export default function Login() {
           showToast(response.data.message); // Show success message
           AsyncStorage.setItem('IsLogin', 'true');
           setIsLogin(false);
-          let userData=response.data.user;
-          console.log(userData,'userData');
-          AsyncStorage.setItem('user',JSON.stringify(userData));
-          setUserDetail(userData);  // Update the state with user data
+          let userData = response.data.user;
+          AsyncStorage.setItem('user', JSON.stringify(userData));
+          setUserDetail(userData); // Update the state with user data
           setSpinner(false);
         } else {
           showToast(response.data.message); // Show failure message
         }
       } catch (error) {
-        showToast('something wrong');
-        // console.error('Error:', error);
+        setSpinner(false);
         if (axios.isAxiosError(error)) {
           if (error.response) {
             showToast(

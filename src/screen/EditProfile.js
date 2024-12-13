@@ -15,43 +15,40 @@ import {useNavigation} from '@react-navigation/native';
 import CustomText from '../customText/CustomText';
 import {fonts} from '../customText/fonts';
 import Header from '../component/Header';
-import {Iconify} from 'react-native-iconify';
-import {launchImageLibrary} from 'react-native-image-picker';
-import ImageModal from '../component/Modal/ImageModal';
 import {useAuthContext} from '../context/GlobaContext';
-import firestore from '@react-native-firebase/firestore';
-import {uploadImageToCloudinary} from '../cloudinary';
 import {showToast} from '../../utils/Toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function EditProfile() {
   let theme = useTheme();
   let navigation = useNavigation();
-  const {Checknetinfo, userDetail} = useAuthContext();
+  const {Checknetinfo, userDetail, setUserDetail, ipAddress} = useAuthContext();
 
   const [spinner, setSpinner] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Initialize state with the prepared object
   const [form, setForm] = useState({
-    name: userDetail?.Name || '',
-    email: userDetail?.Email || '',
+    Name: userDetail?.Name || '',
+    Email: userDetail?.Email || '',
     height: userDetail?.height || '',
     weight: userDetail?.weight || '',
     age: userDetail?.age || '',
     gender: userDetail?.gender || '',
-    password: userDetail?.Password || '',
+    Password: userDetail?.Password || '',
     contact: userDetail?.contact || '',
   });
-
   // Simple validation function
   const validateForm = () => {
     const newErrors = {};
-    if (!form.name) newErrors.name = 'Name is required';
+    if (!form.Name) newErrors.Name = 'Name is required';
+    if (!form.Email) newErrors.Email = 'Email is required';
     if (!form.weight) newErrors.weight = 'Weight is required';
     if (!form.height) newErrors.height = 'Height is required';
     if (!form.age) newErrors.age = 'Age is required';
     if (!form.gender) newErrors.gender = 'Gender is required';
-    if (!form.password) newErrors.password = 'Password is required';
+    if (!form.Password) newErrors.Password = 'Password is required';
     if (!form.contact) newErrors.contact = 'Contact number is required';
     else if (!/^\d{10}$/.test(form.contact))
       newErrors.contact = 'Contact number must be 10 digits';
@@ -69,27 +66,42 @@ export default function EditProfile() {
 
   const handleSubmit = async () => {
     setSpinner(true);
-    const isConnected = await Checknetinfo();
+    const isConnected = await Checknetinfo(); // Check for internet connection
     if (!isConnected) {
       setSpinner(false);
       return; // Do not proceed if there is no internet connection
     }
     try {
       if (validateForm()) {
-        let defaultData = {
-          ...form,
-          create_date: new Date().toISOString(), // Current date and time in ISO format
+        // Create the payload for the request
+        const userData = {
+          Name: form.Name,
+          Email: form.Email,
+          PrevEmail: userDetail?.Email, // Pass the previous email to identify the user
+          Password: form.Password,
         };
-        await firestore()
-          .collection('users')
-          .doc(userDetail?.id)
-          .update(defaultData);
-        // await navigation.goBack();
-        showToast('Profile Updated');
+        // Make the API request to update user details
+        const response = await axios.post(`${ipAddress}/updateuser`, userData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.data.status === 'success') {
+          // Update the user details locally and show a success toast
+          let updateData = {...userDetail?.Id, ...form};
+          await setUserDetail(updateData);
+          AsyncStorage.setItem('user', JSON.stringify(updateData));
+          showToast('Profile Updated');
+        } else {
+          // Show error message from the backend
+          showToast(data.message);
+        }
         setSpinner(false);
       }
     } catch (error) {
       setSpinner(false);
+      // console.error('Error updating profile:', error);
+      showToast('Error updating profile');
     }
   };
 
@@ -118,56 +130,56 @@ export default function EditProfile() {
 
             <TextInput
               label="Name"
-              value={form?.name}
-              onChangeText={value => handleChange('name', value)}
+              value={form?.Name}
+              onChangeText={value => handleChange('Name', value)}
               style={styles.input}
               contentStyle={styles.inputContent}
               mode="outlined"
             />
-            {errors?.name && (
+            {errors?.Name && (
               <CustomText
                 className="bottom-2"
                 style={[
                   styles.errorText,
                   {color: theme.colors.error, fontFamily: fonts.Light},
                 ]}>
-                {errors?.name}
+                {errors?.Name}
               </CustomText>
             )}
             <TextInput
               label="Email"
-              value={form?.email}
-              onChangeText={value => handleChange('email', value)}
+              value={form?.Email}
+              onChangeText={value => handleChange('Email', value)}
               style={styles.input}
               contentStyle={styles.inputContent}
               mode="outlined"
             />
-            {errors?.email && (
+            {errors?.Email && (
               <CustomText
                 className="bottom-2"
                 style={[
                   styles.errorText,
                   {color: theme.colors.error, fontFamily: fonts.Light},
                 ]}>
-                {errors?.email}
+                {errors?.Email}
               </CustomText>
             )}
             <TextInput
               label="Password"
-              value={form?.password}
-              onChangeText={value => handleChange('password', value)}
+              value={form?.Password}
+              onChangeText={value => handleChange('Password', value)}
               style={styles.input}
               contentStyle={styles.inputContent}
               mode="outlined"
             />
-            {errors?.password && (
+            {errors?.Password && (
               <CustomText
                 className="bottom-2"
                 style={[
                   styles.errorText,
                   {color: theme.colors.error, fontFamily: fonts.Light},
                 ]}>
-                {errors?.password}
+                {errors?.Password}
               </CustomText>
             )}
 
@@ -283,8 +295,6 @@ export default function EditProfile() {
           </ScrollView>
         </View>
       </View>
-
-      
     </>
   );
 }
@@ -298,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom:15
+    marginBottom: 15,
   },
 
   profileImage: {
