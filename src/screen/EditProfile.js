@@ -19,6 +19,10 @@ import {useAuthContext} from '../context/GlobaContext';
 import {showToast} from '../../utils/Toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import ImageModal from '../component/Modal/ImageModal';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {Iconify} from 'react-native-iconify';
+import {uploadImageToCloudinary} from '../cloudinary';
 
 export default function EditProfile() {
   let theme = useTheme();
@@ -32,6 +36,7 @@ export default function EditProfile() {
   const [form, setForm] = useState({
     Name: userDetail?.Name || '',
     Email: userDetail?.Email || '',
+    ProfileImage: userDetail?.ProfileImage || '',
     height: userDetail?.height || '',
     weight: userDetail?.weight || '',
     age: userDetail?.age || '',
@@ -64,6 +69,40 @@ export default function EditProfile() {
     }));
   };
 
+  const [selectedImageUri, setSelectedImageUri] = useState(null);
+  // Function to pick an image from the library
+  const selectImage = () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const imageUri = response.assets[0].uri;
+        setSelectedImageUri(imageUri);
+      }
+    });
+  };
+
+  const [visible, setVisible] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [previmage, setPrevimage] = useState(null);
+  // Function to handle opening the modal with animation
+  const handlePrevImage = () => {
+    setVisible(true);
+    let prevImage = selectedImageUri ? selectedImageUri : form?.ProfileImage;
+    setPrevimage(prevImage);
+    Animated.timing(opacityAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const handleSubmit = async () => {
     setSpinner(true);
     const isConnected = await Checknetinfo(); // Check for internet connection
@@ -80,6 +119,26 @@ export default function EditProfile() {
           PrevEmail: userDetail?.Email, // Pass the previous email to identify the user
           Password: form.Password,
         };
+
+        let imageURI;
+        if (selectedImageUri) {
+          // Wait for the image upload to complete and get the image URL
+          const uploadedImageUrl = await uploadImageToCloudinary(
+            form?.Name,
+            // form?.profile_image,
+            selectedImageUri,
+            `Fitness`,
+          );
+          imageURI = uploadedImageUrl?.imageUri;
+          userData.ProfileImage = imageURI;
+          // If the image upload failed, handle it
+          if (!uploadedImageUrl) {
+            console.error('Image upload failed');
+            setSpinner(true);
+            return;
+          }
+        }
+
         // Make the API request to update user details
         const response = await axios.post(`${ipAddress}/updateuser`, userData, {
           headers: {
@@ -88,7 +147,7 @@ export default function EditProfile() {
         });
         if (response.data.status === 'success') {
           // Update the user details locally and show a success toast
-          let updateData = {...userDetail?.Id, ...form};
+          let updateData = {...userDetail?.Id, ...form, ProfileImage: imageURI};
           await setUserDetail(updateData);
           AsyncStorage.setItem('user', JSON.stringify(updateData));
           showToast('Profile Updated');
@@ -104,7 +163,6 @@ export default function EditProfile() {
       showToast('Error updating profile');
     }
   };
-
   return (
     <>
       <Header screenName={'Edit Profile'} />
@@ -119,13 +177,42 @@ export default function EditProfile() {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             <View activeOpacity={0.8} style={styles.imageView}>
-              <Image
-                source={require('../../assets/Image/defaultAvtar.jpg')}
-                style={[
-                  styles.profileImage,
-                  {borderColor: theme.colors.onBackground},
-                ]}
-              />
+              <TouchableOpacity onPress={handlePrevImage}>
+                {selectedImageUri ? (
+                  <Image
+                    source={{uri: selectedImageUri}}
+                    style={[
+                      styles.profileImage,
+                      {borderColor: theme.colors.onBackground},
+                    ]}
+                  />
+                ) : form?.ProfileImage ? (
+                  <Image
+                    source={{uri: form?.ProfileImage}}
+                    style={[
+                      styles.profileImage,
+                      {borderColor: theme.colors.appcolor},
+                    ]}
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/Image/defaultAvtar.jpg')}
+                    style={[
+                      styles.profileImage,
+                      {borderColor: theme.colors.onBackground},
+                    ]}
+                  />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={selectImage}
+                className="items-end bottom-2 right-3">
+                <Iconify
+                  icon="basil:edit-outline"
+                  size={25}
+                  color={theme.colors.outline}
+                />
+              </TouchableOpacity>
             </View>
 
             <TextInput
@@ -295,6 +382,13 @@ export default function EditProfile() {
           </ScrollView>
         </View>
       </View>
+
+      <ImageModal
+        visible={visible}
+        image={previmage}
+        opacityAnim={opacityAnim}
+        setVisible={setVisible}
+      />
     </>
   );
 }

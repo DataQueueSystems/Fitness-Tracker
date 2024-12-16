@@ -131,15 +131,15 @@ export const AuthContextProvider = ({children}) => {
         console.error('Missing email or IP address.');
         return; // Early exit if userDetail or ipAddress is not available
       }
-      
-      const data = { email: userDetail.Email };
-      
+
+      const data = {email: userDetail.Email};
+
       const response = await axios.post(`${ipAddress}/userViewLod`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-  
+
       const responseData = response.data;
       if (responseData.meals) {
         setMeals(responseData.meals);
@@ -157,7 +157,6 @@ export const AuthContextProvider = ({children}) => {
       fetchMeals();
     }
   }, [userDetail, ipAddress, count]); // Add userDetail and ipAddress as dependencies
-  
 
   return (
     <Authcontext.Provider
@@ -186,7 +185,8 @@ export const AuthContextProvider = ({children}) => {
         setFavExercise,
         favFood,
         setFavFood,
-        meals, setMeals
+        meals,
+        setMeals,
       }}>
       {children}
     </Authcontext.Provider>

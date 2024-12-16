@@ -21,10 +21,8 @@ export default function Home() {
   let theme = useTheme();
   let navigation = useNavigation();
   const {userDetail, bmi} = useAuthContext();
-
   const [isModalVisible, setModalVisible] = useState(false);
   const [subtitle, setSubtitle] = useState('');
-
   const handleNavigate = () => {
     navigation.navigate('Profile');
   };
@@ -65,11 +63,31 @@ export default function Home() {
             showsVerticalScrollIndicator={false}>
             <View className="flex-row items-center space-x-2 my-3 px-2">
               <TouchableOpacity onPress={handleNavigate}>
-                <Image
-                  className="rounded-full"
-                  source={require('../../assets/Image/defaultAvtar.jpg')}
-                  style={{width: 45, height: 45}}
-                />
+                {userDetail?.ProfileImage ? (
+                  <Image
+                    className="rounded-full"
+                    source={{uri: userDetail.ProfileImage}}
+                    style={[
+                      {
+                        borderColor: theme.colors.appcolor,
+                        width: 55,
+                        height: 55,
+                      },
+                    ]}
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/Image/defaultAvtar.jpg')}
+                    className="rounded-full"
+                    style={[
+                      {
+                        borderColor: theme.colors.appcolor,
+                        width: 55,
+                        height: 55,
+                      },
+                    ]}
+                  />
+                )}
               </TouchableOpacity>
               <View className="flex-row items-center space-x-1">
                 <CustomText
@@ -208,5 +226,9 @@ const styles = StyleSheet.create({
   Calcaulate: {
     width: Dimensions.get('window').width / 2.3,
     height: Dimensions.get('window').width / 2.2,
+  },
+  profileImage: {
+    height: 100,
+    weight: 100,
   },
 });

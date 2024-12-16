@@ -75,6 +75,7 @@ export default function Register() {
           showToast(response.data.message); // Show failure message
         }
       } catch (error) {
+        setSpinner(false);
         // console.error('Error:', error);
         if (axios.isAxiosError(error)) {
           if (error.response) {

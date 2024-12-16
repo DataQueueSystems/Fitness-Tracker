@@ -26,6 +26,20 @@ export default function Profile() {
     navigation.navigate('EditProfile');
   };
 
+  const [visible, setVisible] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [previmage, setPrevimage] = useState(null);
+  // Function to handle opening the modal with animation
+  const handlePrevImage = imageUri => {
+    setVisible(true);
+    setPrevimage(imageUri);
+    Animated.timing(opacityAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <>
       <View
@@ -53,11 +67,28 @@ export default function Profile() {
               />
             </View>
             <View className="flex-column items-center justify-center space-y-3 my-4">
-              <Image
-                source={require('../../assets/Image/defaultAvtar.jpg')}
-                className="rounded-full"
-                style={{width: 100, height: 100}}
-              />
+              <TouchableOpacity
+                onPress={() => handlePrevImage(userDetail?.ProfileImage)}>
+                {userDetail?.ProfileImage ? (
+                  <Image
+                    className="rounded-full"
+                    source={{uri: userDetail?.ProfileImage}}
+                    style={[
+                      {
+                        borderColor: theme.colors.appcolor,
+                        width: 100,
+                        height: 100,
+                      },
+                    ]}
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/Image/defaultAvtar.jpg')}
+                    className="rounded-full"
+                    style={{width: 100, height: 100}}
+                  />
+                )}
+              </TouchableOpacity>
 
               <CustomText
                 className="text-[19px]"
@@ -244,6 +275,12 @@ export default function Profile() {
               </View>
             </View>
           </ScrollView>
+          <ImageModal
+            visible={visible}
+            image={previmage}
+            opacityAnim={opacityAnim}
+            setVisible={setVisible}
+          />
         </View>
       </View>
     </>
@@ -254,9 +291,5 @@ const styles = StyleSheet.create({
   maincontainer: {
     flex: 1,
     paddingHorizontal: 10,
-  },
-  profileImage: {
-    height: 100,
-    weight: 100,
   },
 });
