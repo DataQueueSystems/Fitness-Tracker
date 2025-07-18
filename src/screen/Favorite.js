@@ -20,8 +20,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import {Iconify} from 'react-native-iconify';
 import {showToast} from '../../utils/Toast';
 import RecommendedFood from '../component/RecommandedFood';
-import axios from 'axios';
-import NoData from '../../assets/Image/NoData.svg';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -32,15 +30,16 @@ function ExerciseScreen() {
 
   let mode = Appearance.getColorScheme();
   const gradientColors =
-    mode == 'light'
-      ? [
-          ['#EAF4FE', '#BBDFFA'], // Light blue to soft blue (calming for light mode)
-          ['#E3F2FD', '#90CAF9'], // Pale blue to sky blue (subtle)
-        ]
-      : [
-          ['#14325a', '#A1C4FD'], // Blue to soft light blue (complementing blue tones)
-          ['#14325a', '#4B4B59'], // Blue to dark grayish tone (contrast with dark appDark)
-        ];
+  mode === 'light'
+    ?[
+      ['#FFE3E3', '#FFD1D1'], // Soft rose to light red
+      ['#FFF0F0', '#FFCCCC'], // Blush white to pastel red
+    ]
+    : [
+        ['#000000', '#2E1A1A'], // Black to dark maroon — deep red tone for dark theme
+        ['#121212', '#1A1A22'], // Dark gray to reddish navy — subtle dark transition
+      ];
+
 
   // Function to get a random gradient color
   const getRandomGradient = () => {
@@ -137,8 +136,8 @@ function ExerciseScreen() {
   return (
     <>
       <View
+      className="flex-1 p-1"
         style={[
-          styles.tabContainer,
           {backgroundColor: theme.colors.background},
         ]}>
         {/* <CustomText style={styles.text}>Exercise Content</CustomText> */}
@@ -151,13 +150,7 @@ function ExerciseScreen() {
             keyExtractor={item => item.day.toString()}
           />
         ) : (
-          <View className="flex-column justify-center">
-            <NoData
-              style={{
-                width: Dimensions.get('window').width / 1.2,
-                height: Dimensions.get('window').width / 1.3,
-              }}
-            />
+          <View className="flex-1 flex-column justify-center">
             <CustomText
               className="text-[16px] text-center"
               style={{fontFamily: fonts.Regular}}>
@@ -173,36 +166,7 @@ function ExerciseScreen() {
 // Nutrition Food Screen
 function NutritionScreen({favFood}) {
   let theme = useTheme();
-  const {ipAddress, userDetail, count,meals, setMeals} = useAuthContext();
-  const [loading, setLoading] = useState(true);
-
-  // const fetchMeals = async () => {
-  //   try {
-  //     let data = {
-  //       email: userDetail?.Email,
-  //     };
-  //     const response = await axios.post(`${ipAddress}/userViewLod`, data, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-  //     const responseData = response.data;
-  //     if (responseData.meals) {
-  //       setMeals(responseData.meals);
-  //     } else if (responseData.error) {
-  //       console.error(responseData.error);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching meals:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchMeals();
-  // }, [count]);
-
+  const {meals, setMeals} = useAuthContext();
   const [totalDetail, setTotalDetail] = useState(null);
   useEffect(() => {
     const calculateTotals = () => {

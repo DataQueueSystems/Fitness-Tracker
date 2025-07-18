@@ -3,7 +3,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -111,7 +110,7 @@ export default function Home() {
                 <CustomText
                   numberOfLines={3}
                   className="text-[16px]"
-                  style={{fontFamily: fonts.Medium}}>
+                  style={{fontFamily: fonts.Regular}}>
                   Easily Calculate your BMI
                 </CustomText>
                 <Button
@@ -121,8 +120,8 @@ export default function Home() {
                   className="my-1">
                   <CustomText
                     style={{
-                      color: '#fff',
                       fontFamily: fonts.Bold,
+                      color: '#fff',
                     }}>
                     Calcaulate
                   </CustomText>
@@ -136,8 +135,8 @@ export default function Home() {
                 className="my-3 p-4 rounded-lg mx-2 "
                 style={{backgroundColor: theme.colors.appDark, elevation: 10}}>
                 <CustomText
-                  className="text-[16px] font-medium"
-                  style={{fontFamily: fonts.Medium}}>
+                  className="text-[16px] "
+                  style={{fontFamily: fonts.Regular}}>
                   {bmi >= 30
                     ? 'Obesity: You should consult a healthcare provider.'
                     : bmi >= 25
@@ -190,7 +189,7 @@ export default function Home() {
                 <View className="mt-7 px-2 mb-2">
                   <CustomText
                     className="text-[18px]"
-                    style={{fontFamily: fonts.Medium}}>
+                    style={{fontFamily: fonts.Regular}}>
                     Please enter your BMI to get personalized exercise
                     recommendations.
                   </CustomText>

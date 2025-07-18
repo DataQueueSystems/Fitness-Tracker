@@ -77,7 +77,7 @@ export default function Nutrition() {
               </CustomText>
 
               <CustomText
-                className="text-gray-200"
+                className="text-gray-500"
                 style={[styles.subTitleText, {fontFamily: fonts.Regular}]}>
                 A balanced diet is key to a healthy body and mind. Whether you
                 want to lose weight, build muscle, or boost your overall health,
@@ -85,7 +85,7 @@ export default function Nutrition() {
               </CustomText>
 
               <CustomText
-                className="text-gray-200"
+                className="text-gray-500"
                 style={[styles.subTitleText, {fontFamily: fonts.Regular}]}>
                 Let’s make small, impactful changes to improve our eating habits
                 and feel our best every day.

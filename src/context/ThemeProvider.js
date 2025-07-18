@@ -4,34 +4,62 @@ import {
   MD3LightTheme as DefaultTheme,
   MD3DarkTheme as DarkTheme,
 } from 'react-native-paper';
-// Define custom themes with onboarding background colors
+
+// Define red-based light theme
 const lightTheme = {
-  ...DefaultTheme,
+  dark: false,
+  roundness: 10,
   colors: {
-    ...DefaultTheme.colors,
-    background: '#fff',
-    error: '#d9534f',
-    blue: '#4a51a3', // Deep Blue
-    green: '#388E3C',
-    appColor: '#2F80ED',
-    appDark: '#F4F4F9',
-    btn: '#2F80ED',
+    primary: '#D32F2F',
+    accent: '#F44336',
+    background: '#FFFFFF',
+    surface: '#FFFFFF',
+    text: '#2D1E1E',
+    error: '#C62828',
+    success: '#43A047',
+    warning: '#FB8C00',
+    info: '#0288D1',
+    appColor: '#D32F2F',
+    appDark: '#FDECEA',
+    btn: '#D32F2F',
+    placeholder: '#A1887F',
+    border: '#E0E0E0',
+    
+    // Onboarding banner backgrounds
+    banner1: '#FFEAEA',  // Soft blush
+    banner2: '#FFF5F5',  // Neutral pink
+    banner3: '#FDECEA',  // Light peach
   },
-  roundness: 8,
 };
+
+// Define red-based dark theme
 const darkTheme = {
-  ...DarkTheme,
+  dark: true,
+  roundness: 10,
   colors: {
-    ...DarkTheme.colors,
-    background: '#0B0B12',
-    error: '#d9534f',
-    green: '#388E3C',
-    appColor: '#2F80ED',
-    appDark: '#161626',
-    btn: '#2F80ED',
+    primary: '#FF6E6E',
+    accent: '#EF5350',
+    background: '#000000',
+    surface: '#2C2C2C',
+    text: '#FFFFFF',
+    error: '#FF5252',
+    success: '#66BB6A',
+    warning: '#FFA726',
+    info: '#29B6F6',
+    appColor: '#FF6E6E',
+    appDark: '#2E1A1A',
+    btn: '#FF6E6E',
+    placeholder: '#BDBDBD',
+    border: '#444444',
+
+    // Onboarding banner backgrounds
+    banner1: '#000000',  // Pure black
+    banner2: '#121212',  // Dark gray
+    banner3: '#1A1A22',  // Deep navy/red-black
   },
-  roundness: 8,
 };
+
+
 
 const ThemeContext = createContext();
 

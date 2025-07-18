@@ -27,7 +27,6 @@ export default function Compare() {
   const [food1, setFood1] = useState(null);
   const [food2, setFood2] = useState(null);
   const [comparedData, setComparedData] = useState(null);
-
   useFocusEffect(
     useCallback(() => {
       const GetfoodNames = () => {
@@ -108,7 +107,7 @@ export default function Compare() {
           </CustomText>
 
           <CustomText
-            className="text-gray-200"
+            className="text-gray-500"
             style={[styles.subTitleText, {fontFamily: fonts.Regular}]}>
             Discover nutritious meal options tailored to your dietary needs.
             Compare and choose the best meals for your lifestyle!
@@ -126,7 +125,7 @@ export default function Compare() {
           </CustomText>
 
           <CustomText
-            className="text-gray-200"
+            className="text-gray-500"
             style={[styles.subTitleText, {fontFamily: fonts.Regular}]}>
             Dive into our selection of meals that are not only delicious but
             also packed with nutrients. Make informed choices for a healthier
@@ -203,7 +202,12 @@ export default function Compare() {
                   borderColor:
                     comparedData?.food1?.protein > comparedData?.food2?.protein
                       ? theme.colors.appColor
-                      : theme.colors.error, // If Food 1 has higher protein, appColor else 'red'
+                      : 'gray', // If Food 1 has higher protein, appColor else 'red'
+                  borderBottomWidth:
+                    comparedData?.food1?.protein > comparedData?.food2?.protein
+                      ? 13
+                      : 4, // If Food 1 has higher protein, appColor else 'red'
+                  backgroundColor: theme.colors.background,
                 },
               ]}>
               <Image
@@ -241,6 +245,11 @@ export default function Compare() {
                     comparedData?.food2?.protein > comparedData?.food1?.protein
                       ? theme.colors.appColor
                       : theme.colors.error, // If Food 1 has higher protein, appColor else 'red'
+                  borderBottomWidth:
+                    comparedData?.food2?.protein > comparedData?.food1?.protein
+                      ? 13
+                      : 4, // If Food 1 has higher protein, appColor else 'red'
+                  backgroundColor: theme.colors.background,
                 },
               ]}>
               <Image
@@ -305,10 +314,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 3,
-    borderWidth: 1,
   },
   foodText: {
     fontSize: 16,

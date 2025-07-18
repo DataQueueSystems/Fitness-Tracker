@@ -14,6 +14,7 @@ import {Iconify} from 'react-native-iconify';
 import {useAuthContext} from '../context/GlobaContext';
 import {showToast} from '../../utils/Toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { hexToRgba } from '../../utils/globa';
 
 export default function Exercise() {
   const theme = useTheme();
@@ -22,16 +23,17 @@ export default function Exercise() {
   const [category, setCategory] = useState(null);
 
   let mode = Appearance.getColorScheme();
+  
   const gradientColors =
-    mode == 'light'
-      ? [
-          ['#EAF4FE', '#BBDFFA'], // Light blue to soft blue (calming for light mode)
-          ['#E3F2FD', '#90CAF9'], // Pale blue to sky blue (subtle)
-        ]
-      : [
-          ['#14325a', '#A1C4FD'], // Blue to soft light blue (complementing blue tones)
-          ['#14325a', '#4B4B59'], // Blue to dark grayish tone (contrast with dark appDark)
-        ];
+  mode === 'light'
+    ?[
+      ['#FFE3E3', '#FFD1D1'], // Soft rose to light red
+      ['#FFF0F0', '#FFCCCC'], // Blush white to pastel red
+    ]
+    : [
+        ['#000000', '#2E1A1A'], // Black to dark maroon — deep red tone for dark theme
+        ['#121212', '#1A1A22'], // Dark gray to reddish navy — subtle dark transition
+      ];
 
   const renderItem = (item, handleFav) => {
     const isFav = favExercise.some(fav => fav?.day === item?.day); // Check if any object in favExercise has the same day
@@ -58,31 +60,31 @@ export default function Exercise() {
           <Iconify
             icon="solar:heart-bold"
             size={32}
-            color={isFav ? '#353434' : theme.colors.appColor} // Red if the item is favorited
+            color={isFav ?  theme.colors.appColor:hexToRgba('#353434',0.3)} // Red if the item is favorited
           />
         </TouchableOpacity>
 
         <CustomText
           className="text-[15px] "
           style={{
-            fontFamily: fonts.SemiBold,
+            fontFamily: fonts.Medium,
             color: mode == 'light' ? theme.colors.outline : '#fff',
           }}>
           Day {item?.day}:
         </CustomText>
         <CustomText
-          className="text-[18px]"
+          className="text-md"
           style={{
-            fontFamily: fonts.Medium,
+            fontFamily: fonts.Regular,
             color: mode == 'light' ? theme.colors.outline : '#fff',
           }}>
           {item?.exercise}
         </CustomText>
         <CustomText
-          className="text-[13px]"
+          className="text-xs"
           style={{
             fontFamily: fonts.Regular,
-            color: mode == 'light' ? theme.colors.outline : '#fff',
+            color:hexToRgba(theme.colors.text,0.8),
           }}>
           {item?.subtitle}
         </CustomText>

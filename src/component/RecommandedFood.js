@@ -6,13 +6,12 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import {Button, useTheme} from 'react-native-paper';
+import {Button, Text, useTheme} from 'react-native-paper';
 import CustomText from '../customText/CustomText';
 import {fonts} from '../customText/fonts';
 import axios from 'axios';
 import {useAuthContext} from '../context/GlobaContext';
 import {showToast} from '../../utils/Toast';
-import NoData from '../../assets/Image/NoData.svg';
 
 const RecommendedFood = ({
   forDelete,
@@ -20,7 +19,6 @@ const RecommendedFood = ({
   userdietDetail,
   setMeals,
 }) => {
-  
   let theme = useTheme();
   const {ipAddress, userDetail, setCount, count} = useAuthContext();
   const [spinner, setSpinner] = useState(false);
@@ -189,15 +187,17 @@ const RecommendedFood = ({
               {/* Delete Log Button */}
               <Button
                 onPress={() => handleDeleteLog(item)}
-                mode="contained"
-                style={[
-                  {backgroundColor: theme.colors.error, marginTop: 16},
-                  {borderRadius: 14},
-                ]}
-                className="py-2">
+                style={{
+                  backgroundColor: theme.colors.error,
+                  borderRadius: 14,
+                  marginTop: 12,
+                }}
+                contentStyle={{
+                  paddingVertical: 2, // Decrease for thinner button
+                }}>
                 {spinner ? (
                   <ActivityIndicator
-                    size={24}
+                    size={20}
                     color={theme.colors.background}
                   />
                 ) : (
@@ -216,15 +216,17 @@ const RecommendedFood = ({
               {/* Add to Log Button */}
               <Button
                 onPress={() => handleAddLog(item)}
-                mode="contained"
-                style={[
-                  {backgroundColor: theme.colors.btn, marginTop: 16},
-                  {borderRadius: 14},
-                ]}
-                className="py-2">
+                style={{
+                  backgroundColor: theme.colors.btn,
+                  borderRadius: 14,
+                  marginTop: 12,
+                }}
+                contentStyle={{
+                  paddingVertical: 2, // Reduce height (default is 8–12)
+                }}>
                 {spinner ? (
                   <ActivityIndicator
-                    size={24}
+                    size={20}
                     color={theme.colors.background}
                   />
                 ) : (
@@ -244,20 +246,12 @@ const RecommendedFood = ({
     );
   };
 
- 
-
   return (
     <View className="my-1 mt-1">
       {nutritionFood?.length == 0 ? (
         <>
-          <View className="flex-column justify-center pb-10">
-            <NoData
-              style={{
-                width: Dimensions.get('window').width / 1.2,
-                height: Dimensions.get('window').width / 1.3,
-              }}
-            />
-              <CustomText
+          <View className="flex-column justify-center pb-10 mt-10">
+            <CustomText
               className="text-[16px] text-center"
               style={{fontFamily: fonts.Regular}}>
               No logged meals found!

@@ -16,7 +16,7 @@ const Header = ({screenName, backIcon}) => {
         {!backIcon == false ||
           (backIcon == undefined && (
             <Appbar.BackAction
-              color={theme.colors.onBackground}
+              color={theme.colors.text}
               onPress={BackNavigation}
             />
           ))}
@@ -27,7 +27,7 @@ const Header = ({screenName, backIcon}) => {
             fontSize: 18,
             fontFamily: 'Poppins-SemiBold',
             // color: theme.colors.blackGrey,
-            color: theme.colors.onBackground,
+            color: theme.colors.text,
           }}
         />
       </Appbar.Header>
