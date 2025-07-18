@@ -13,7 +13,6 @@ import CustomText from '../customText/CustomText';
 import {fonts} from '../customText/fonts';
 import Calcaulate from '../../assets/Image/Calculate.svg';
 import CalculateModal from '../component/Modal/Calculate';
-import Exercise from './Exercise';
 import {useAuthContext} from '../context/GlobaContext';
 
 export default function Home() {
@@ -23,7 +22,6 @@ export default function Home() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [subtitle, setSubtitle] = useState('');
   const handleNavigate = () => {
-    navigation.navigate('Profile');
   };
   const ShowModal = () => {
     setModalVisible(true);
@@ -182,7 +180,6 @@ export default function Home() {
                     10-Day Exercise Plan Based on BMI:
                   </CustomText>
                 </View>
-                <Exercise />
               </>
             ) : (
               <>
