@@ -31,7 +31,6 @@ export default function EditProfile() {
 
   const [spinner, setSpinner] = useState(false);
   const [errors, setErrors] = useState({});
-
   // Initialize state with the prepared object
   const [form, setForm] = useState({
     Name: userDetail?.Name || '',
@@ -113,32 +112,33 @@ export default function EditProfile() {
     try {
       if (validateForm()) {
         // Create the payload for the request
+
+        // Prepare user data
         const userData = {
           Name: form.Name,
           Email: form.Email,
-          PrevEmail: userDetail?.Email, // Pass the previous email to identify the user
+          PrevEmail: userDetail?.Email, // Used to identify the user
           Password: form.Password,
         };
 
-        let imageURI;
+        let imageURI = userDetail?.ProfileImage; // Default to previous image
+
         if (selectedImageUri) {
-          // Wait for the image upload to complete and get the image URL
           const uploadedImageUrl = await uploadImageToCloudinary(
-            form?.Name,
-            // form?.profile_image,
+            form.Name,
             selectedImageUri,
-            `Fitness`,
+            'Fitness',
           );
-          imageURI = uploadedImageUrl?.imageUri;
-          userData.ProfileImage = imageURI;
-          // If the image upload failed, handle it
-          if (!uploadedImageUrl) {
+          if (uploadedImageUrl?.imageUri) {
+            imageURI = uploadedImageUrl.imageUri;
+          } else {
             console.error('Image upload failed');
-            setSpinner(true);
+            setSpinner(false);
             return;
           }
         }
 
+        userData.ProfileImage = imageURI;
         // Make the API request to update user details
         const response = await axios.post(`${ipAddress}/updateuser`, userData, {
           headers: {

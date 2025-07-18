@@ -3,14 +3,14 @@ import React, {useState} from 'react';
 import Onboarding from 'react-native-onboarding-swiper';
 import CustomText from '../customText/CustomText';
 import {useTheme} from 'react-native-paper';
-import Onboading1 from '../../assets/Image/boarding1.svg';
-import Onboading2 from '../../assets/Image/boarding2.svg';
-import Onboading3 from '../../assets/Image/boarding3.svg';
 import {useNavigation} from '@react-navigation/native';
 import {fonts} from '../customText/fonts';
+import {hexToRgba} from '../../utils/globa';
+import {Iconify} from 'react-native-iconify';
 
 const FirstScreen = theme => ({
-  backgroundColor: '#1a1a2e',
+  backgroundColor: theme.colors.banner1,
+
   title: (
     <>
       <View style={{flexDirection: 'row', gap: 1, marginHorizontal: 6}}>
@@ -20,16 +20,16 @@ const FirstScreen = theme => ({
             fontSize: 24,
             color: theme.colors.appColor,
           }}>
-          Welcome to FitnessTrack!
+          Your Health, Your Way
         </CustomText>
       </View>
       <CustomText
         style={{
           fontFamily: fonts.Bold,
           fontSize: 17,
-          color:'#bdb9b9'
+          color: theme.colors.text,
         }}>
-        Let's Begin Your Journey
+        Kickstart Your Fitness Lifestyle
       </CustomText>
     </>
   ),
@@ -41,24 +41,28 @@ const FirstScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
-          color:'#bdb9b9'
-
+            color: hexToRgba(theme.colors.text, 0.7),
           }}>
-          Start tracking your fitness goals, monitor progress, and receive
-          personalized exercise and diet plans tailored just for you.
+          Begin your journey towards a healthier you. Set goals, stay committed,
+          and transform your routine with confidence.
         </CustomText>
       </View>
     </>
   ),
   image: (
     <View style={styles.imageContainer}>
-      <Onboading1 style={styles.image} />
+      <Iconify
+        icon="arcticons:mapmyfitness"
+        size={280}
+        color={theme.colors.appColor}
+      />
     </View>
   ),
 });
 
 const SecondScreen = theme => ({
-  backgroundColor: '#131320',
+  backgroundColor: theme.colors.banner2,
+
   title: (
     <>
       <View style={{flexDirection: 'row', gap: 1, marginHorizontal: 6}}>
@@ -68,17 +72,16 @@ const SecondScreen = theme => ({
             fontSize: 24,
             color: theme.colors.appColor,
           }}>
-          Track Your Progress
+          Stay on Top of Your Goals
         </CustomText>
       </View>
       <CustomText
         style={{
           fontFamily: fonts.Bold,
           fontSize: 18,
-          color:'#bdb9b9'
-
+          color: theme.colors.text,
         }}>
-        Every Step of the Way
+        Insights That Keep You Moving
       </CustomText>
     </>
   ),
@@ -90,24 +93,28 @@ const SecondScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
-          color:'#bdb9b9'
-
+            color: hexToRgba(theme.colors.text, 0.7),
           }}>
-          Monitor your workouts, log your meals, and stay motivated with
-          real-time updates on your fitness journey.
+          Analyze your activity, track achievements, and push your limits with
+          smart insights and visual progress updates.
         </CustomText>
       </View>
     </>
   ),
   image: (
     <View style={styles.imageContainer}>
-      <Onboading3 style={styles.image} />
+      <Iconify
+        icon="mynaui:chart-line"
+        size={280}
+        color={theme.colors.appColor}
+      />
     </View>
   ),
 });
 
 const ThirdScreen = theme => ({
-  backgroundColor: '#1a1a2e',
+  backgroundColor: theme.colors.banner3,
+
   title: (
     <>
       <View style={{flexDirection: 'row', gap: 1, marginHorizontal: 2}}>
@@ -117,17 +124,16 @@ const ThirdScreen = theme => ({
             fontSize: 24,
             color: theme.colors.appColor,
           }}>
-          Get Personalized Recommendations
+          Smarter Fitness, Just for You
         </CustomText>
       </View>
       <CustomText
         style={{
           fontFamily: fonts.Bold,
           fontSize: 18,
-          color:'#bdb9b9'
-
+          color: theme.colors.text,
         }}>
-        Tailored to You
+        AI-Powered Health Guidance
       </CustomText>
     </>
   ),
@@ -139,18 +145,21 @@ const ThirdScreen = theme => ({
             fontFamily: fonts.Regular,
             fontSize: 15,
             textAlign: 'center',
-          color:'#bdb9b9'
-
+            color: hexToRgba(theme.colors.text, 0.7),
           }}>
-          Based on your age, weight, and height, receive customized exercise
-          plans, diet recommendations, and weekly fitness tips.
+          Get curated workouts, meal ideas, and weekly routines based on your
+          body and goals — no more guessing.
         </CustomText>
       </View>
     </>
   ),
   image: (
     <View style={styles.imageContainer}>
-      <Onboading2 style={styles.image} />
+      <Iconify
+        icon="ri:apps-2-ai-line"
+        size={280}
+        color={theme.colors.appColor}
+      />
     </View>
   ),
 });
@@ -168,7 +177,7 @@ export default function OnboardingScreen() {
       <Onboarding
         onDone={handleNavigate}
         onSkip={handleNavigate} // Replace 'HomeScreen' with your desired navigation target
-        containerStyles={{flex: 1, justifyContent: 'flex-start'}}
+        containerStyles={{flex: 1, justifyContent: 'center'}}
         pages={[FirstScreen(theme), SecondScreen(theme), ThirdScreen(theme)]}
         bottomBarHighlight={false}
         skipLabel={
@@ -176,7 +185,7 @@ export default function OnboardingScreen() {
             style={{
               fontSize: 16,
               color: theme.colors.appColor,
-              fontFamily:fonts.Medium
+              fontFamily: fonts.Medium,
             }}>
             Skip
           </CustomText>
@@ -186,8 +195,7 @@ export default function OnboardingScreen() {
             style={{
               fontSize: 16,
               color: theme.colors.appColor,
-              fontFamily:fonts.Medium
-
+              fontFamily: fonts.Medium,
             }}>
             Next
           </CustomText>

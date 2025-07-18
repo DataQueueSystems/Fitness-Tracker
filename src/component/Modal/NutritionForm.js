@@ -14,7 +14,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useAuthContext} from '../../context/GlobaContext';
 import axios from 'axios';
 import {showToast} from '../../../utils/Toast';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NutritionForm = ({route}) => {
   let {setNutritionFood,setUserdietDetail} = route.params;
@@ -126,7 +125,7 @@ const NutritionForm = ({route}) => {
 
   const selectedPickerStyle = {
     fontFamily: 'Poppins-Regular',
-    color: theme.colors.onBackground,
+    color: theme.colors.text,
   };
 
   const pickerStyle = {

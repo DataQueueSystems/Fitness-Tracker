@@ -27,14 +27,14 @@ const MyIcons = (route, focused, theme) => {
       <Iconify
         icon="solar:home-smile-linear"
         size={size}
-        color={theme.colors.outline}
+        color={theme.colors.placeholder}
       />
     );
   } else if (route.name === 'Nutrition') {
     icons = focused ? (
       <Iconify icon="ep:food" size={28} color={theme.colors.appColor} />
     ) : (
-      <Iconify icon="ep:food" size={size} color={theme.colors.outline} />
+      <Iconify icon="ep:food" size={size} color={theme.colors.placeholder} />
     );
   } else if (route.name === 'Favorite') {
     icons = focused ? (
@@ -47,14 +47,14 @@ const MyIcons = (route, focused, theme) => {
       <Iconify
         icon="solar:heart-linear"
         size={size}
-        color={theme.colors.outline}
+        color={theme.colors.placeholder}
       />
     );
   } else if (route.name === 'Compare') {
     icons = focused ? (
       <Iconify icon="fluent:branch-compare-20-regular" size={28} color={theme.colors.appColor} />
     ) : (
-      <Iconify icon="fluent:branch-compare-20-regular" size={size} color={theme.colors.outline} />
+      <Iconify icon="fluent:branch-compare-20-regular" size={size} color={theme.colors.placeholder} />
     );
   } else if (route.name === 'Profile') {
     icons = focused ? (
@@ -67,7 +67,7 @@ const MyIcons = (route, focused, theme) => {
       <Iconify
         icon="fluent:person-28-regular"
         size={26}
-        color={theme.colors.outline}
+        color={theme.colors.placeholder}
       />
     );
   }

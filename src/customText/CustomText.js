@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Text } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 
 const CustomText = ({ style, ...props }) => {
-  return <Text  style={[style]} {...props} />;
+  let {colors}=useTheme();
+  return <Text  style={[{color:colors.text},style,]} {...props} />;
 };
 
 export default CustomText;
