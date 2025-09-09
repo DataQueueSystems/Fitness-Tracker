@@ -8,6 +8,8 @@ import CustomText from '../customText/CustomText.js';
 import {fonts} from '../customText/fonts.js';
 import Favorite from './Favorite.js';
 import Profile from './Profile.js';
+import Nutrition from './Nutrition.js';
+import Compare from './Compare.js';
 
 const Bottom = createBottomTabNavigator();
 const MyIcons = (route, focused, theme) => {
@@ -145,14 +147,13 @@ const BottomNavigator = () => {
         })}>
         <Bottom.Screen name="Home" component={Home} />
         {/* <Bottom.Screen name="Nutrition" component={Nutrition} /> */}
-        <Bottom.Screen name="Favorite" component={Favorite} />
-        <Bottom.Screen name="Profile" component={Profile} />
-        {/* 
+        {/* <Bottom.Screen name="Favorite" component={Favorite} />
+        <Bottom.Screen name="Profile" component={Profile} /> */}
         <Bottom.Screen name="Nutrition" component={Nutrition} />
-        <Bottom.Screen name="Compare" component={Compare} />
+        {/* <Bottom.Screen name="Compare" component={Compare} /> */}
         <Bottom.Screen name="Favorite" component={Favorite} />
         <Bottom.Screen name="Profile" component={Profile} /> 
-        */}
+       
       </Bottom.Navigator>
     </>
   );

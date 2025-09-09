@@ -59,7 +59,6 @@ export default function AppNavigator() {
         ) : (
           <>
             <Stack.Screen name="Spinner" component={Spinner} />
-
             <Stack.Screen name="BottomTab" component={BottomNavigator} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
