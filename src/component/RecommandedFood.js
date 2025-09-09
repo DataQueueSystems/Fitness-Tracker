@@ -12,7 +12,16 @@ import {fonts} from '../customText/fonts';
 import axios from 'axios';
 import {useAuthContext} from '../context/GlobaContext';
 import {showToast} from '../../utils/Toast';
-
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  SlideInRight,
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 const RecommendedFood = ({
   forDelete,
   nutritionFood,
@@ -94,10 +103,12 @@ const RecommendedFood = ({
     }
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({item, index}) => {
     return (
       <>
-        <View className="mt-3 border border-white p-2 rounded-14">
+        <Animated.View
+          entering={FadeInDown.duration(300 + index * 100)} // ⏳ duration increases with index
+          className="mt-3 border border-white p-2 rounded-14">
           <View
             style={{backgroundColor: theme.colors.background}}
             className="flex-row rounded-lg overflow-hidden">
@@ -241,7 +252,7 @@ const RecommendedFood = ({
               </Button>
             </>
           )}
-        </View>
+        </Animated.View>
       </>
     );
   };
@@ -261,7 +272,7 @@ const RecommendedFood = ({
       ) : (
         <FlatList
           data={nutritionFood}
-          renderItem={renderItem}
+          renderItem={(item, index) => renderItem(item, index)}
           keyExtractor={item => item?.FoodName}
           className="mt-2 mb-10"
         />

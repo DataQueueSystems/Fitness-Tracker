@@ -49,59 +49,49 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-    if (validateForm()) {
-      setSpinner(true);
-      const userForm = new FormData();
-      userForm.append('Email', form.email); // Append the email field
-      userForm.append('Password', form.password); // Append the password field
-      let userData = {
-        Email: 'fds',
-        Id: 8,
-        Name: 'John Doe',
-        Password: '12',
-      };
-      AsyncStorage.setItem('IsLogin', 'true');
-
-      setIsLogin(false);
-      showToast('Login successfull'); // Show success message
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
-      setUserDetail(userData); // Update the state with user data
-      setSpinner(false);
-
-      // try {
-      //   // Send POST request with userForm
-      //   let response = await axios.post(`${ipAddress}/UserLogin`, userForm, {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data', // Ensure Flask processes it as FormData
-      //     },
-      //   });
-      //   if (response.data.success) {
-      //     showToast(response.data.message); // Show success message
-      //     AsyncStorage.setItem('IsLogin', 'true');
-      //     setIsLogin(false);
-      //     let userData = response.data.user;
-      //     console.log(userData, 'userData');
-
-      //     AsyncStorage.setItem('user', JSON.stringify(userData));
-      //     setUserDetail(userData); // Update the state with user data
-      //     setSpinner(false);
-      //   } else {
-      //     showToast(response.data.message); // Show failure message
-      //   }
-      // } catch (error) {
-      //   setSpinner(false);
-      //   if (axios.isAxiosError(error)) {
-      //     if (error.response) {
-      //       showToast(
-      //         `${error.response.data.message || 'Something went wrong'}`,
-      //       );
-      //     } else {
-      //       showToast('Network error, please try again');
-      //     }
-      //   }
-      // }
-    } else {
+    if (!validateForm()) {
       showToast('Some invalid data');
+      return;
+    }
+
+    setSpinner(true);
+
+    try {
+      const userForm = new FormData();
+      userForm.append('Email', form.email);
+      userForm.append('Password', form.password);
+
+      console.log(ipAddress, 'ipAddress');
+
+      // Send POST request
+      const response = await axios.post(`${ipAddress}/UserLogin`, userForm, {
+        headers: {'Content-Type': 'multipart/form-data'},
+      });
+
+      if (response.data.success) {
+        showToast(response.data.message);
+
+        const userData = response.data.user;
+        await AsyncStorage.setItem('IsLogin', 'true');
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+
+        setUserDetail(userData);
+        setIsLogin(false);
+      } else {
+        showToast(response.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          showToast(error.response.data.message || 'Something went wrong');
+        } else {
+          showToast('Network error, please try again');
+        }
+      } else {
+        showToast('Unexpected error, please try again');
+      }
+    } finally {
+      setSpinner(false);
     }
   };
 
